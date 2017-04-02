@@ -1,6 +1,7 @@
 (ns mininova-ui.ui
   (:require [reagent.core :as reagent]
-            [re-frame.core :as rf]))
+            [re-frame.core :as rf]
+            [mininova-ui.midi :as midi]))
 
 (def default-panel :osc)
 
@@ -13,14 +14,17 @@
   (fn [db _]
     (get db ::panel default-panel)))
 
-(rf/reg-event-db ::control
+(rf/reg-event-fx ::control
   [rf/debug]
-  (fn [db [_ id value midi?]]
-    (assoc-in db [::control id] value)))
+  (fn [fx [_ cc value midi?]]
+    (-> fx
+        (assoc-in [:db ::control cc] value)
+        ;; FIXME: (if-not midi?)
+        (assoc ::midi/midi [[176 cc value]]))))
 
 (rf/reg-sub ::control
-  (fn [db [_ id]]
-    (get-in db [::control id])))
+  (fn [db [_ cc]]
+    (get-in db [::control cc])))
 
 (defn tabs []
   (let [tab @(rf/subscribe [::panel])]
@@ -32,20 +36,20 @@
             :on-click #(rf/dispatch [::panel :filter])}
         "Filter"]]))
 
-(defn knob [{:keys [id label min max]}]
-  (let [value @(rf/subscribe [::control id])]
+(defn knob [{:keys [cc label min max]}]
+  (let [value @(rf/subscribe [::control cc])]
     [:div.knob
       [:label label
         [:input {:type :range
                  :min min
                  :max max
-                 :on-change #(rf/dispatch [::control id (.-currentTarget.value %)])}]
+                 :on-change #(rf/dispatch [::control cc (.-currentTarget.value %)])}]
         [:span value]]]))
 
 (defn osc-panel []
   [:div.osc-panel
     [:h2 "Oscillator"]
-    [knob {:id :osc/semitune :label "Semitune" :min -12 :max 12}]])
+    [knob {:cc 26 :label "Semitune" :min 0 :max 127}]])
 
 (defn filter-panel []
   [:div.filter-panel
