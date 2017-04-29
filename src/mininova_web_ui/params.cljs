@@ -26,6 +26,36 @@
 (def filter-type-enum
   ["Lp6NoRes" "LP12" "LP18" "LP24" "BP6/\\6" "BP12/\\12" "BP6/\\12" "BP12/\\6" "BP6/\\18" "BP18/\\6" "HP6NoRes" "HP12" "HP18" "HP24"])
 
+(def env-anim-trigger-enum
+  ["Off"
+   "A1ReTrig" "A2ReTrig" "A3ReTrig" "A4ReTrig" "A5ReTrig" "A6ReTrig" "A7ReTrig" "A8ReTrig"
+   "A1Triggr" "A2Triggr" "A3Triggr" "A4Triggr" "A5Triggr" "A6Triggr" "A7Triggr" "A8Triggr"
+   "A1Enable" "A2Enable" "A3Enable" "A4Enable" "A5Enable" "A6Enable" "A7Enable" "A8Enable"])
+
+(def lfo-waveform-enum
+  [;; 0-9
+   "Sine" "Triangle" "Sawtooth" "Square" "Rand S/H" "Time S/H" "PianoEnv" "Seq 1" "Seq 2" "Seq 3"
+   ;; 10-19
+   "Seq 4" "Seq 5" "Seq 6" "Seq 7" "Altern 1" "Altern 2" "Altern 3" "Altern 4" "Altern 5" "Altern 6"
+   ;; 20-29
+   "Altern 7" "Altern 8" "Chromat" "Chrom 16" "Major" "Major 7" "Minor7" "MinArp1" "MinArp2" "Diminish"
+   ;; 30-37
+   "DecMinor" "Minor3rd" "Pedal" "4ths" "4ths x12" "1625 Maj" "1625 Min" "2511"])
+
+(def sync-enum
+  [;; 0-9
+   "Off" "32nd T" "32nd" "16th T" "16th" "8th T" "16th D" "8th" "4th T" "8th D"
+   ;; 10-19
+   "4th" "1 + 1/3" "4th D" "2nd" "2 + 2/3" "3 beats" "4 beats" "5 + 1/3" "6 beats" "8 beats"
+   ;; 20-29
+   "10 + 2/3" "12 beats" "13 + 1/3" "16 beats" "18 beats" "18 + 2/3" "20 beats" "21 + 1/3" "24 beats" "28 beats"
+   ;; 30-35
+   "30 beats" "32 beats" "36 beats" "42 beats" "48 beats" "64 beats"])
+
+(def arp-pattern-enum
+  ["32nd T" "32nd" "16th T" "16th" "8th T" "16th D" "8th" "4th T" "8th D" "4th"
+   "1 + 1/3" "4th D" "2nd" "2 + 2/3" "3 beats" "4 beats" "5 + 1/3" "6 beats" "8 beats"])
+
 (def fx-select-enum
   ["Bypass" "EQ" "Compres1" "Compres2" "Distort1" "Distort2" "Delay 1" "Delay 2" "Reverb 1" "Reverb 2" "Chorus 1" "Chorus 2" "Chorus 3" "Chorus 4" "Gator"])
 
@@ -154,135 +184,138 @@
 
    :env/track-centre {:cc 106 :in [0 127]}
 
-   :env-1/sustain {:cc 70 :in [0 127]}
-   :env-1/release {:cc 72 :in [0 127]}
-   :env-1/attack {:cc 73 :in [0 127]}
-   :env-1/decay {:cc 75 :in [0 127]}
-   :env-1/velocity {:cc 108 :in [0 127] :out [-64 63]}
-   :env-1/sustain-rate {:cc 109 :in [0 127] :out [-64 63]}
-   :env-1/sustain-time {:cc 110 :in [0 127]}
-   :env-1/ad-repeats {:cc 111 :in [0 127]}
-   :env-1/attack-track {:cc 112 :in [0 127] :out [-64 63]}
-   :env-1/decay-track {:cc 113 :in [0 127] :out [-64 63]}
-   :env-1/level-track {:cc 114 :in [0 127] :out [-64 63]}
-   :env-1/attack-slope {:cc 115 :in [0 127]}
-   :env-1/decay-slope {:cc 116 :in [0 127]}
-   :env-1/anim-trigger {:cc 117 :in [0 8] :offset 128}  ;; TODO: Enum (Different then env-2/trigger to env-6/trigger!)
-   :env-1/trigger {:cc [0 122] :in [0 1] :enum ["Single" "Multi"]}
+   :env-1/sustain {:cc 70 :in [0 127] :offset 118}
+   :env-1/release {:cc 72 :in [0 127] :offset 119}
+   :env-1/attack {:cc 73 :in [0 127] :offset 116}
+   :env-1/decay {:cc 75 :in [0 127] :offset 117}
+   :env-1/velocity {:cc 108 :in [0 127] :out [-64 63] :offset 115}
+   :env-1/sustain-rate {:cc 109 :in [0 127] :out [-64 63] :offset 120}
+   :env-1/sustain-time {:cc 110 :in [0 127] :offset 121}
+   :env-1/ad-repeats {:cc 111 :in [0 127] :offset 122}
+   :env-1/attack-track {:cc 112 :in [0 127] :out [-64 63] :offset 123}
+   :env-1/decay-track {:cc 113 :in [0 127] :out [-64 63] :offset 124}
+   :env-1/level-track {:cc 114 :in [0 127] :out [-64 63] :offset 125}
+   :env-1/attack-slope {:cc 115 :in [0 127] :offset 126}
+   :env-1/decay-slope {:cc 116 :in [0 127] :offset 127}
+   :env-1/anim-trigger {:cc 117 :in [0 8] :enum env-anim-trigger-enum :offset 128}
+   ;; TODO: Figure out the encoding
+   :env-1/trigger {:cc [0 122] :in [0 1] :enum ["Single" "Multi"] :offset 112}
 
    :env-2/velocity {:cc [0 0] :in [0 127] :out [-64 63] :offset 129}
    :env-2/attack {:cc [0 1] :in [0 127] :offset 130}
-   :env-2/decay {:cc [0 2] :in [0 127]}
-   :env-2/sustain {:cc [0 3] :in [0 127]}
-   :env-2/release {:cc [0 4] :in [0 127]}
-   :env-2/sustain-rate {:cc [0 5] :in [0 127] :out [-64 63]}
-   :env-2/sustain-time {:cc [0 6] :in [0 127]}
-   :env-2/ad-repeats {:cc [0 7] :in [0 127]}
-   :env-2/attack-track {:cc [0 8] :in [0 127] :out [-64 63]}
-   :env-2/decay-track {:cc [0 9] :in [0 127] :out [-64 63]}
-   :env-2/level-track {:cc [0 10] :in [0 127] :out [-64 63]}
-   :env-2/attack-slope {:cc [0 11] :in [0 127]}
-   :env-2/decay-slope {:cc [0 12] :in [0 127]}
-   :env-2/anim-trigger {:cc [0 13] :in [0 24]}  ;; TODO: Enum
-   :env-2/trigger {:cc [0 122] :in [2 3] :enum ["Single" "Multi"]}
+   :env-2/decay {:cc [0 2] :in [0 127] :offset 131}
+   :env-2/sustain {:cc [0 3] :in [0 127] :offset 132}
+   :env-2/release {:cc [0 4] :in [0 127] :offset 133}
+   :env-2/sustain-rate {:cc [0 5] :in [0 127] :out [-64 63] :offset 134}
+   :env-2/sustain-time {:cc [0 6] :in [0 127] :offset 135}
+   :env-2/ad-repeats {:cc [0 7] :in [0 127] :offset 136}
+   :env-2/attack-track {:cc [0 8] :in [0 127] :out [-64 63] :offset 137}
+   :env-2/decay-track {:cc [0 9] :in [0 127] :out [-64 63] :offset 138}
+   :env-2/level-track {:cc [0 10] :in [0 127] :out [-64 63] :offset 139}
+   :env-2/attack-slope {:cc [0 11] :in [0 127] :offset 140}
+   :env-2/decay-slope {:cc [0 12] :in [0 127] :offset 141}
+   :env-2/anim-trigger {:cc [0 13] :in [0 24] :enum env-anim-trigger-enum :offset 142}
+   :env-2/trigger {:cc [0 122] :in [2 3] :enum ["Single" "Multi"] :offset 112}
 
-   :env-3/delay {:cc [0 14] :in [0 127]}
-   :env-3/attack {:cc [0 15] :in [0 127]}
-   :env-3/decay {:cc [0 16] :in [0 127]}
-   :env-3/sustain {:cc [0 17] :in [0 127]}
-   :env-3/release {:cc [0 18] :in [0 127]}
-   :env-3/sustain-rate {:cc [0 19] :in [0 127] :out [-64 63]}
-   :env-3/sustain-time {:cc [0 20] :in [0 127]}
-   :env-3/ad-repeats {:cc [0 21] :in [0 127]}
-   :env-3/attack-track {:cc [0 22] :in [0 127] :out [-64 63]}
-   :env-3/decay-track {:cc [0 23] :in [0 127] :out [-64 63]}
-   :env-3/level-track {:cc [0 24] :in [0 127] :out [-64 63]}
-   :env-3/attack-slope {:cc [0 25] :in [0 127]}
-   :env-3/decay-slope {:cc [0 26] :in [0 127]}
-   :env-3/anim-trigger {:cc [0 27] :in [0 24]} ;; TODO: Enum
-   :env-3/trigger {:cc [0 122] :in [4 5] :enum ["Single" "Multi"]}
+   :env-3/delay {:cc [0 14] :in [0 127] :offset 143}
+   :env-3/attack {:cc [0 15] :in [0 127] :offset 144}
+   :env-3/decay {:cc [0 16] :in [0 127] :offset 145}
+   :env-3/sustain {:cc [0 17] :in [0 127] :offset 146}
+   :env-3/release {:cc [0 18] :in [0 127] :offset 147}
+   :env-3/sustain-rate {:cc [0 19] :in [0 127] :out [-64 63] :offset 148}
+   :env-3/sustain-time {:cc [0 20] :in [0 127] :offset 149}
+   :env-3/ad-repeats {:cc [0 21] :in [0 127] :offset 150}
+   :env-3/attack-track {:cc [0 22] :in [0 127] :out [-64 63] :offset 151}
+   :env-3/decay-track {:cc [0 23] :in [0 127] :out [-64 63] :offset 152}
+   :env-3/level-track {:cc [0 24] :in [0 127] :out [-64 63] :offset 153}
+   :env-3/attack-slope {:cc [0 25] :in [0 127] :offset 154}
+   :env-3/decay-slope {:cc [0 26] :in [0 127] :offset 155}
+   :env-3/anim-trigger {:cc [0 27] :in [0 24] :enum env-anim-trigger-enum :offset 156}
+   :env-3/trigger {:cc [0 122] :in [4 5] :enum ["Single" "Multi"]  :offset 112}
 
-   :env-4/delay {:cc [0 28] :in [0 127]}
-   :env-4/attack {:cc [0 29] :in [0 127]}
-   :env-4/decay {:cc [0 30] :in [0 127]}
+   :env-4/delay {:cc [0 28] :in [0 127] :offset 157}
+   :env-4/attack {:cc [0 29] :in [0 127] :offset 158}
+   :env-4/decay {:cc [0 30] :in [0 127] :offset 159}
    :env-4/sustain {:cc [0 31] :in [0 127] :offset 160}
    :env-4/release {:cc [0 32] :in [0 127] :offset 161}
    :env-4/sustain-rate {:cc [0 33] :in [0 127] :out [-64 63] :offset 162}
-   :env-4/sustain-time {:cc [0 34] :in [0 127]}
-   :env-4/ad-repeats {:cc [0 35] :in [0 127]}
-   :env-4/attack-track {:cc [0 36] :in [0 127] :out [-64 63]}
-   :env-4/decay-track {:cc [0 37] :in [0 127] :out [-64 63]}
-   :env-4/level-track {:cc [0 38] :in [0 127] :out [-64 63]}
-   :env-4/attack-slope {:cc [0 39] :in [0 127]}
-   :env-4/decay-slope {:cc [0 40] :in [0 127]}
-   :env-4/anim-trigger {:cc [0 41] :in [0 24]} ;; TODO: Enum
-   :env-4/trigger {:cc [0 122] :in [6 7] :enum ["Single" "Multi"]}
+   :env-4/sustain-time {:cc [0 34] :in [0 127] :offset 163}
+   :env-4/ad-repeats {:cc [0 35] :in [0 127] :offset 164}
+   :env-4/attack-track {:cc [0 36] :in [0 127] :out [-64 63] :offset 165}
+   :env-4/decay-track {:cc [0 37] :in [0 127] :out [-64 63] :offset 166}
+   :env-4/level-track {:cc [0 38] :in [0 127] :out [-64 63] :offset 167}
+   :env-4/attack-slope {:cc [0 39] :in [0 127] :offset 168}
+   :env-4/decay-slope {:cc [0 40] :in [0 127] :offset 169}
+   :env-4/anim-trigger {:cc [0 41] :in [0 24] :enum env-anim-trigger-enum :offset 170}
+   :env-4/trigger {:cc [0 122] :in [6 7] :enum ["Single" "Multi"] :offset 112}
 
-   :env-5/delay {:cc [0 42] :in [0 127]}
-   :env-5/attack {:cc [0 43] :in [0 127]}
-   :env-5/decay {:cc [0 44] :in [0 127]}
-   :env-5/sustain {:cc [0 45] :in [0 127]}
-   :env-5/release {:cc [0 46] :in [0 127]}
-   :env-5/sustain-rate {:cc [0 47] :in [0 127] :out [-64 63]}
-   :env-5/sustain-time {:cc [0 48] :in [0 127]}
-   :env-5/ad-repeats {:cc [0 49] :in [0 127]}
-   :env-5/attack-track {:cc [0 50] :in [0 127] :out [-64 63]}
-   :env-5/decay-track {:cc [0 51] :in [0 127] :out [-64 63]}
-   :env-5/level-track {:cc [0 52] :in [0 127] :out [-64 63]}
-   :env-5/attack-slope {:cc [0 53] :in [0 127]}
-   :env-5/decay-slope {:cc [0 54] :in [0 127]}
-   :env-5/anim-trigger {:cc [0 55] :in [0 24]} ;; TODO: Enum
-   :env-5/trigger {:cc [0 122] :in [8 9] :enum ["Single" "Multi"]}
+   :env-5/delay {:cc [0 42] :in [0 127] :offset 171}
+   :env-5/attack {:cc [0 43] :in [0 127] :offset 172}
+   :env-5/decay {:cc [0 44] :in [0 127] :offset 173}
+   :env-5/sustain {:cc [0 45] :in [0 127] :offset 174}
+   :env-5/release {:cc [0 46] :in [0 127] :offset 175}
+   :env-5/sustain-rate {:cc [0 47] :in [0 127] :out [-64 63] :offset 176}
+   :env-5/sustain-time {:cc [0 48] :in [0 127] :offset 177}
+   :env-5/ad-repeats {:cc [0 49] :in [0 127] :offset 178}
+   :env-5/attack-track {:cc [0 50] :in [0 127] :out [-64 63] :offset 179}
+   :env-5/decay-track {:cc [0 51] :in [0 127] :out [-64 63] :offset 180}
+   :env-5/level-track {:cc [0 52] :in [0 127] :out [-64 63] :offset 181}
+   :env-5/attack-slope {:cc [0 53] :in [0 127] :offset 182}
+   :env-5/decay-slope {:cc [0 54] :in [0 127] :offset 183}
+   :env-5/anim-trigger {:cc [0 55] :in [0 24] :enum env-anim-trigger-enum :offset 184}
+   :env-5/trigger {:cc [0 122] :in [8 9] :enum ["Single" "Multi"] :offset 112}
 
-   :env-6/delay {:cc [0 56] :in [0 127]}
-   :env-6/attack {:cc [0 57] :in [0 127]}
-   :env-6/decay {:cc [0 58] :in [0 127]}
-   :env-6/sustain {:cc [0 59] :in [0 127]}
-   :env-6/release {:cc [0 60] :in [0 127]}
-   :env-6/sustain-rate {:cc [0 61] :in [0 127] :out [-64 63]}
-   :env-6/sustain-time {:cc [0 62] :in [0 127]}
+   :env-6/delay {:cc [0 56] :in [0 127] :offset 185}
+   :env-6/attack {:cc [0 57] :in [0 127] :offset 186}
+   :env-6/decay {:cc [0 58] :in [0 127] :offset 187}
+   :env-6/sustain {:cc [0 59] :in [0 127] :offset 188}
+   :env-6/release {:cc [0 60] :in [0 127] :offset 189}
+   :env-6/sustain-rate {:cc [0 61] :in [0 127] :out [-64 63] :offset 190}
+   :env-6/sustain-time {:cc [0 62] :in [0 127] :offset 191}
    :env-6/ad-repeats {:cc [0 63] :in [0 127] :offset 192}
    :env-6/attack-track {:cc [0 64] :in [0 127] :out [-64 63] :offset 193}
-   :env-6/decay-track {:cc [0 65] :in [0 127] :out [-64 63]}
-   :env-6/level-track {:cc [0 66] :in [0 127] :out [-64 63]}
-   :env-6/attack-slope {:cc [0 67] :in [0 127]}
-   :env-6/decay-slope {:cc [0 68] :in [0 127]}
-   :env-6/anim-trigger {:cc [0 69] :in [0 24]} ;; TODO: Enum
-   :env-6/trigger {:cc [0 122] :in [10 11] :enum ["Single" "Multi"]}
+   :env-6/decay-track {:cc [0 65] :in [0 127] :out [-64 63] :offset 194}
+   :env-6/level-track {:cc [0 66] :in [0 127] :out [-64 63] :offset 195}
+   :env-6/attack-slope {:cc [0 67] :in [0 127] :offset 196}
+   :env-6/decay-slope {:cc [0 68] :in [0 127] :offset 197}
+   :env-6/anim-trigger {:cc [0 69] :in [0 24] :enum env-anim-trigger-enum :offset 198}
+   :env-6/trigger {:cc [0 122] :in [10 11] :enum ["Single" "Multi"] :offset 112}
 
-   :lfo-1/waveform {:cc [0 70] :in [0 37]} ;; TODO: Enum
-   :lfo-1/phase-offset {:cc [0 71] :in [0 119] :out [0 357]}
-   :lfo-1/slew-rate {:cc [0 72] :in [0 127]}
-   :lfo-1/delay {:cc [0 74] :in [0 127]}
-   :lfo-1/delay-sync {:cc [0 75] :in [0 35]} ;; TODO: Enum
-   :lfo-1/rate {:cc [0 76] :in [0 127]}
-   :lfo-1/rate-sync {:cc [0 77] :in [0 35]} ;; TODO: Enum
-   :lfo-1/one-shot {:cc [0 122] :in [12 13] :enum ["Normal" "OneShot"]}
-   :lfo-1/key-sync {:cc [0 122] :in [14 15] :enum ["FreeRun" "KeySync"]}
-   :lfo-1/common-sync {:cc [0 122] :in [16 17] :enum ["Normal" "Common"]}
-   :lfo-1/delay-trigger {:cc [0 122] :in [18 19] :enum ["Single" "Multi"]}
-   :lfo-1/fade-mode {:cc [1 123] :in [0 3] :enum ["Fade In" "Fade Out" "Gate In" "Gate Out"]}
+   :lfo-1/waveform {:cc [0 70] :in [0 37] :enum lfo-waveform-enum :offset 199}
+   :lfo-1/phase-offset {:cc [0 71] :in [0 119] :out [0 357] :offset 200}
+   :lfo-1/slew-rate {:cc [0 72] :in [0 127] :offset 201}
+   :lfo-1/delay {:cc [0 74] :in [0 127] :offset 203}
+   :lfo-1/delay-sync {:cc [0 75] :in [0 35] :enum sync-enum :offset 204}
+   :lfo-1/rate {:cc [0 76] :in [0 127] :offset 205}
+   :lfo-1/rate-sync {:cc [0 77] :in [0 35] :enum sync-enum :offset 206}
+   ;; TODO: Figure out the encoding
+   :lfo-1/one-shot {:cc [0 122] :in [12 13] :enum ["Normal" "OneShot"] :offset 207}
+   :lfo-1/key-sync {:cc [0 122] :in [14 15] :enum ["FreeRun" "KeySync"] :offset 207}
+   :lfo-1/common-sync {:cc [0 122] :in [16 17] :enum ["Normal" "Common"] :offset 207}
+   :lfo-1/delay-trigger {:cc [0 122] :in [18 19] :enum ["Single" "Multi"] :offset 207}
+   ;; TODO: Figure out the encoding
+   :lfo-1/fade-mode {:cc [1 123] :in [0 3] :enum ["Fade In" "Fade Out" "Gate In" "Gate Out"] :offset 379}
 
-   :lfo-2/waveform {:cc [0 79] :in [0 37]} ;; TODO: Enum
-   :lfo-2/phase-offset {:cc [0 80] :in [0 119] :out [0 357]}
-   :lfo-2/slew-rate {:cc [0 81] :in [0 127]}
-   :lfo-2/delay {:cc [0 83] :in [0 127]}
-   :lfo-2/delay-sync {:cc [0 84] :in [0 35]} ;; TODO: Enum
-   :lfo-2/rate {:cc [0 85] :in [0 127]}
-   :lfo-2/rate-sync {:cc [0 86] :in [0 35]} ;; TODO: Enum
-   :lfo-2/one-shot {:cc [0 122] :in [22 23] :enum ["Normal" "OneShot"]}
-   :lfo-2/key-sync {:cc [0 122] :in [24 25] :enum ["FreeRun" "KeySync"]}
-   :lfo-2/common-sync {:cc [0 122] :in [26 27] :enum ["Normal" "Common"]}
-   :lfo-2/delay-trigger {:cc [0 122] :in [28 29] :enum ["Single" "Multi"]}
-   :lfo-2/fade-mode {:cc [1 123] :in [4 7] :enum ["Fade In" "Fade Out" "Gate In" "Gate Out"]}
+   :lfo-2/waveform {:cc [0 79] :in [0 37] :enum lfo-waveform-enum :offset 208}
+   :lfo-2/phase-offset {:cc [0 80] :in [0 119] :out [0 357] :offset 209}
+   :lfo-2/slew-rate {:cc [0 81] :in [0 127] :offset 210}
+   :lfo-2/delay {:cc [0 83] :in [0 127] :offset 212}
+   :lfo-2/delay-sync {:cc [0 84] :in [0 35] :enum sync-enum :offset 213}
+   :lfo-2/rate {:cc [0 85] :in [0 127] :offset 214}
+   :lfo-2/rate-sync {:cc [0 86] :in [0 35] :enum sync-enum :offset 215}
+   :lfo-2/one-shot {:cc [0 122] :in [22 23] :enum ["Normal" "OneShot"] :offset 216}
+   :lfo-2/key-sync {:cc [0 122] :in [24 25] :enum ["FreeRun" "KeySync"] :offset 216}
+   :lfo-2/common-sync {:cc [0 122] :in [26 27] :enum ["Normal" "Common"] :offset 216}
+   :lfo-2/delay-trigger {:cc [0 122] :in [28 29] :enum ["Single" "Multi"] :offset 216}
+   :lfo-2/fade-mode {:cc [1 123] :in [4 7] :enum ["Fade In" "Fade Out" "Gate In" "Gate Out"] :offset 379}
 
-   :lfo-3/waveform {:cc [0 88] :in [0 37]} ;; TODO: Enum
-   :lfo-3/phase-offset {:cc [0 89] :in [0 119] :out [0 357]}
-   :lfo-3/slew-rate {:cc [0 90] :in [0 127]}
-   :lfo-3/delay {:cc [0 92] :in [0 127]}
-   :lfo-3/delay-sync {:cc [0 93] :in [0 35]} ;; TODO: Enum
-   :lfo-3/rate {:cc [0 94] :in [0 127]}
-   :lfo-3/rate-sync {:cc [0 95] :in [0 35] :offset 224} ;; TODO: Enum
+   :lfo-3/waveform {:cc [0 88] :in [0 37] :enum lfo-waveform-enum :offset 217}
+   :lfo-3/phase-offset {:cc [0 89] :in [0 119] :out [0 357] :offset 218}
+   :lfo-3/slew-rate {:cc [0 90] :in [0 127] :offset 219}
+   :lfo-3/delay {:cc [0 92] :in [0 127] :offset 221}
+   :lfo-3/delay-sync {:cc [0 93] :in [0 35] :enum sync-enum :offset 222}
+   :lfo-3/rate {:cc [0 94] :in [0 127] :offset 223}
+   :lfo-3/rate-sync {:cc [0 95] :in [0 35] :enum sync-enum :offset 224}
    :lfo-3/one-shot {:cc [0 122] :in [32 33] :enum ["Normal" "OneShot"] :offset 225}
    :lfo-3/key-sync {:cc [0 122] :in [34 35] :enum ["FreeRun" "KeySync"] :offset 225}
    :lfo-3/common-sync {:cc [0 122] :in [36 37] :enum ["Normal" "Common"] :offset 225}
@@ -292,8 +325,9 @@
 
    :fx-pan/position {:cc 10 :in [0 127] :out [-64 63]}
    :fx-pan/rate {:cc 88 :in [0 127]}
-   :fx-pan/sync {:cc 89 :in [0 35]} ;; TODO: Enum values
+   :fx-pan/sync {:cc 89 :in [0 35] :enum sync-enum}
    :fx-pan/mod-depth {:cc 90 :in [0 127]}
+
    :fx/routing {:cc [0 97] :in [0 7]} ;; TODO: Enum
    :fx/feedback {:cc [0 98] :in [0 127]}
 
@@ -511,25 +545,32 @@
    :vocal-tune/vibrato-mod-wheel {:cc [2 61] :in [0 127]}
    :vocal-tune/vibrato-rate {:cc [2 62] :in [0 127]}
 
-   :arp/on {:cc [0 122] :in [46 47] :enum ["Off" "On"]}
-   :arp/key-latch {:cc [0 122] :in [50 51] :enum ["Latch Off" "Latch On"]}
-   :arp/octaves {:cc [1 62] :in [0 3] :out [1 4]}
-   :arp/rate-sync {:cc [1 63] :in [0 18]}
-   :arp/gate {:cc [1 64] :in [1 127] :offset 130}
+   ;; TODO: Figure out the encoding @ 317
+   ;; FIXME: Modifying either `on` or `key-latch` changes both in the store because they share
+   ;; the `cc`. Make `::ui/control` action smarter about this
+   :arp/on {:cc [0 122] :in [46 47] :enum ["Off" "On"] :offset 317}
+   :arp/key-latch {:cc [0 122] :in [50 51] :enum ["Latch Off" "Latch On"] :offset 317}
+   :arp/octaves {:cc [1 62] :in [0 3] :out [1 4] :offset 318}
+   :arp/rate-sync {:cc [1 63] :in [0 18] :enum arp-pattern-enum :offset 319}
+   ;; FIXME: This was detected at 320 AND 325?
+   :arp/gate {:cc [1 64] :in [1 127] :offset 320}
    :arp/mode {:cc [1 65] :in [0 6] :enum ["Up" "Down" "UpDown" "UpDown2" "Played" "Random" "Chord"] :offset 321}
-   :arp/pattern {:cc [1 66] :in [0 18]} ;; TODO: Enum
-   :arp/swing {:cc [1 68] :in [1 99]}
-   :arp/mini-nova {:cc [127 127] :in [0 1] :offset 0} ;; TODO: Remove? _Managed parameter for UltraNova compatibility_
-   :arp/length {:cc [60 40] :in [2 8]}
+   :arp/pattern {:cc [1 66] :in [0 18] :enum arp-pattern-enum :offset 322}
+   :arp/swing {:cc [1 68] :in [1 99] :offset 324}
+   ;; Managed parameter for UltraNova compatibility_
+   ;; :arp/mini-nova {:cc [127 127] :in [0 1] :offset 0}
+   :arp/length {:cc [60 40] :in [2 8] :offset 325}
 
-   :arp-1/step {:cc [60 32], :in [0 1], :offset 239},
-   :arp-2/step {:cc [60 33], :in [0 1], :offset 159},
-   :arp-3/step {:cc [60 34], :in [0 1], :offset 347},
-   :arp-4/step {:cc [60 35], :in [0 1], :offset 333},
-   :arp-5/step {:cc [60 36], :in [0 1], :offset 443},
-   :arp-6/step {:cc [60 37], :in [0 1], :offset 153},
-   :arp-7/step {:cc [60 38], :in [0 1], :offset 457},
-   :arp-8/step {:cc [60 39], :in [0 1], :offset 370},
+   ;; FIXME: step 1 was detected at 325?!
+   ;; TODO: Figure out the encoding @ 326
+   :arp-1/step {:cc [60 32], :in [0 1], :offset 326},
+   :arp-2/step {:cc [60 33], :in [0 1], :offset 326},
+   :arp-3/step {:cc [60 34], :in [0 1], :offset 326},
+   :arp-4/step {:cc [60 35], :in [0 1], :offset 326},
+   :arp-5/step {:cc [60 36], :in [0 1], :offset 326},
+   :arp-6/step {:cc [60 37], :in [0 1], :offset 326},
+   :arp-7/step {:cc [60 38], :in [0 1], :offset 326},
+   :arp-8/step {:cc [60 39], :in [0 1], :offset 326},
 
    :mod-matrix-1/source-1 {:cc [1 83] :in [0 18] :enum mod-matrix-source-enum}
    :mod-matrix-1/source-2 {:cc [1 84] :in [0 18] :enum mod-matrix-source-enum}
