@@ -48,20 +48,38 @@
             :on-click #(rf/dispatch [::panel :env])}
         "Env"]]))
 
+(defn map-in-out [in out])
+
 (defn knob [{:keys [id label]}]
   (let [param (get params/params id)
         value @(rf/subscribe [::control (:cc param)])]
     [:div.knob
       [:label label
-        [:input {:type :range
+        [:input {:id id
+                 :type :range
+                 :value value
                  :min (first (:in param))
                  :max (last (:in param))
                  :on-change #(rf/dispatch [::control (:cc param) (.-currentTarget.value %)])}]
         [:span value]]]))
 
+(defn select-enum [{:keys [id label]}]
+  (let [param (get params/params id)
+        value @(rf/subscribe [::control (:cc param)])]
+    [:div.select-enum
+      [:label label
+        [:select {:id id
+                  :value (or value "")
+                  :on-change #(rf/dispatch [::control (:cc param) (.-currentTarget.value %)])}
+         [:option {:value ""} "Waveform"]
+         (for [[val lbl] (map vector (range (count (:enum param))) (:enum param))]
+           ^{:key val}
+           [:option {:value val} lbl])]]]))
+
 (defn osc-panel []
   [:div.osc-panel
     [:h2 "Oscillator"]
+    [select-enum {:id :osc-1/wave :label "Waveform"}]
     [knob {:id :osc-1/semitones :label "Semitone"}]])
 
 (defn filter-panel []

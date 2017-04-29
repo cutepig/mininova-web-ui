@@ -3,6 +3,24 @@
 (def waveforms (range 0 72))  ;; TODO: Proper enum of waveforms
 (def filter-types (range 0 14)) ;; TODO
 
+(def osc-waveform-enum
+  [;; 0-10
+   "Sine" "Triangle" "Sawtooth" "Saw9:1PW" "Saw8:2PW" "Saw7:3PW" "Saw6:4PW" "Saw5:5PW" "Saw4:6PW" "Saw3:7PW" "Saw2:8PW"
+   ;; 11-20
+   "Saw1:9PW" "PW" "Square" "BassCamp" "Bass_FM" "EP_Dull" "EP_Bell" "Clav" "DoubReed" "Retro"
+   ;; 21-30
+   "StrnMch1" "StrnMch2" "Organ_1" "Organ_2" "EvilOrg" "HiStuff" "Bell_FM1" "Bell_FM2" "DigBell1" "DigBell2"
+   ;; 31-40
+   "DigBell3" "DigBell4" "DigiPad" "Wtable1" "Wtable2" "Wtable3" "Wtable4" "Wtable5" "Wtable6" "Wtable7"
+   ;; 41-50
+   "Wtable8" "Wtable9" "Wtable10" "Wtable11" "Wtable12" "Wtable13" "Wtable14" "Wtable15" "Wtable16" "Wtable17"
+   ;; 51-60
+   "Wtable18" "Wtable19" "Wtable20" "Wtable21" "Wtable22" "Wtable23" "Wtable24" "Wtable25" "Wtable26" "Wtable27"
+   ;; 61-70
+   "Wtable28" "Wtable29" "Wtable30" "Wtable31" "Wtable32" "Wtable33" "Wtable34" "Wtable35" "Wtable36" "AudInL/M"
+   ;; 71
+   "AudioInR"])
+
 (def fx-select-enum
   ["Bypass" "EQ" "Compres1" "Compres2" "Distort1" "Distort2" "Delay 1" "Delay 2" "Reverb 1" "Reverb 2" "Chorus 1" "Chorus 2" "Chorus 3" "Chorus 4" "Gator"])
 (def mod-matrix-source-enum
@@ -48,9 +66,8 @@
    :osc/vibrato-speed {:cc 76 :in [0 127] :offset 41}
    :osc/vibrato-depth {:cc 77 :in [0 127] :offset 42}
 
-   :osc-1/wave {:cc 19 :in [0 71] :offset 46} ;; TODO: Enum
+   :osc-1/wave {:cc 19 :in [0 71] :enum osc-waveform-enum :offset 46}
    :osc-1/wave-interpolate {:cc 20 :in [0 127] :offset 47}
-   ;; This could be :map #(- % 64) - :map range-64 - or something
    :osc-1/pulse-width-index {:cc 21 :in [0 127] :out [-64 63] :offset 48}
    :osc-1/virtual-sync-depth {:cc 22 :in [0 127] :offset 49}
    :osc-1/hardness {:cc 23 :in [0 127] :offset 50}
@@ -60,7 +77,7 @@
    :osc-1/cents {:cc 27 :in [0 127] :out [-64 63] :offset 54}
    :osc-1/pitch-bend {:cc 28 :in [52 76] :out [-12 12] :offset 55}
 
-   :osc-2/wave {:cc 29 :in [0 71] :offset 56} ;; TODO: Enum
+   :osc-2/wave {:cc 29 :in [0 71] :enum osc-waveform-enum :offset 56}
    :osc-2/wave-interpolate {:cc 30 :in [0 127] :offset 57}
    :osc-2/pulse-width-index {:cc 31 :in [0 127] :out [-64 63] :offset 58}
    :osc-2/virtual-sync-depth {:cc 33 :in [0 127] :offset 59}
@@ -71,7 +88,7 @@
    :osc-2/cents {:cc 39 :in [0 127] :out [-64 63] :offset 64}
    :osc-2/pitch-bend {:cc 0x28 :in [52 76] :out [-12 12] :offset 65}
 
-   :osc-3/wave {:cc 41 :in [0 71] :offset 66} ;; TODO: Enum
+   :osc-3/wave {:cc 41 :in [0 71] :enum osc-waveform-enum :offset 66}
    :osc-3/wave-interpolate {:cc 42 :in [0 127] :offset 67}
    :osc-3/pulse-width-index {:cc 43 :in [0 127] :out [-64 63] :offset 68}
    :osc-3/virtual-sync-depth {:cc 44 :in [0 127] :offset 69}
