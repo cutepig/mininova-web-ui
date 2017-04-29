@@ -21,10 +21,17 @@
    ;; 71
    "AudioInR"])
 
+(def filter-drive-type-enum
+  ["Diode" "Valve" "Clipper" "XOver" "Rectify" "BitsDown" "RateDown"])
+(def filter-type-enum
+  ["Lp6NoRes" "LP12" "LP18" "LP24" "BP6/\\6" "BP12/\\12" "BP6/\\12" "BP12/\\6" "BP6/\\18" "BP18/\\6" "HP6NoRes" "HP12" "HP18" "HP24"])
+
 (def fx-select-enum
   ["Bypass" "EQ" "Compres1" "Compres2" "Distort1" "Distort2" "Delay 1" "Delay 2" "Reverb 1" "Reverb 2" "Chorus 1" "Chorus 2" "Chorus 3" "Chorus 4" "Gator"])
+
 (def mod-matrix-source-enum
   ["Direct" "ModWheel" "AftTouch" "Express" "Velocity" "Keyboard" "LFO1 +" "LFO1 +/-" "LFO2 +" "LFO2 +/-" "LFO3 +" "LFO3 +/-" "Env Amp" "Env Filt" "Env 3" "Env 4" "Env 5" "Env 6" "AudInEnv"])
+
 (def anim-trigger-enum
   ["Off" "A1ReTrig" "A2ReTrig" "A3ReTrig" "A4ReTrig" "A5ReTrig" "A6ReTrig" "A7ReTrig" "A8ReTrig"])
 
@@ -117,8 +124,8 @@
    :filter/res-link {:cc [0 122] :in [44 45] :enum ["Off" "On"] :offset 88}
 
    :filter-1/drive {:cc 63 :in [0 127] :out [0 127] :offset 89}
-   :filter-1/drive-type {:cc 65 :in [0 6] :enum ["Diode" "Valve" "Clipper" "XOver" "Rectify" "BitsDown" "RateDown"] :offset 90}
-   :filter-1/type {:cc 68 :in [0 13] :offset 91} ;; TODO: Enum
+   :filter-1/drive-type {:cc 65 :in [0 6] :enum filter-drive-type-enum :offset 90}
+   :filter-1/type {:cc 68 :in [0 13] :enum filter-type-enum :offset 91}
    :filter-1/track {:cc 69 :in [0 127] :offset 93}
    :filter-1/resonance {:cc 71 :in [0 127] :offset 94}
    :filter-1/frequency {:cc 74 :in [0 127] :offset 92}
@@ -126,8 +133,8 @@
    :filter-1/env-2->freq {:cc 79 :in [0 127] :out [-64 63] :offset 96}
 
    :filter-2/drive {:cc 80 :in [0 127] :out [0 127] :offset 97}
-   :filter-2/drive-type {:cc 81 :in [0 6] :enum ["Diode" "Valve" "Clipper" "XOver" "Rectify" "BitsDown" "RateDown"] :offset 98}
-   :filter-2/type {:cc 82 :in [0 13] :offset 99} ;; TODO: Enum
+   :filter-2/drive-type {:cc 81 :in [0 6] :enum filter-drive-type-enum :offset 98}
+   :filter-2/type {:cc 82 :in [0 13] :enum filter-type-enum :offset 99}
    :filter-2/frequency {:cc 83 :in [0 127] :offset 100}
    :filter-2/track {:cc 84 :in [0 127] :offset 101}
    :filter-2/resonance {:cc 85 :in [0 127] :offset 102}
