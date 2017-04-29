@@ -1,5 +1,6 @@
 (ns mininova-web-ui.core
   (:require [reagent.core :as reagent :refer [atom]]
+            [mininova-web-ui.midi :as midi]
             [mininova-web-ui.ui :as ui]))
 
 (enable-console-print!)
@@ -10,6 +11,7 @@
 
 (defonce app-state (atom {:text "Hello world!"}))
 
+(midi/initialize-mininova!)
 (reagent/render-component [ui/main-panel]
                           (. js/document (getElementById "app")))
 
