@@ -1,7 +1,8 @@
 (ns mininova-web-ui.ui
   (:require [reagent.core :as reagent]
             [re-frame.core :as rf]
-            [mininova-web-ui.midi :as midi]))
+            [mininova-web-ui.midi :as midi]
+            [mininova-web-ui.params :as params]))
 
 (def default-panel :osc)
 
@@ -47,29 +48,31 @@
             :on-click #(rf/dispatch [::panel :env])}
         "Env"]]))
 
-(defn knob [{:keys [cc label min max]}]
-  (let [value @(rf/subscribe [::control cc])]
+(defn knob [{:keys [id label]}]
+  (let [param (get params/params id)
+        value @(rf/subscribe [::control (:cc param)])]
     [:div.knob
       [:label label
         [:input {:type :range
-                 :min min
-                 :max max
-                 :on-change #(rf/dispatch [::control cc (.-currentTarget.value %)])}]
+                 :min (first (:in param))
+                 :max (last (:in param))
+                 :on-change #(rf/dispatch [::control (:cc param) (.-currentTarget.value %)])}]
         [:span value]]]))
 
 (defn osc-panel []
   [:div.osc-panel
     [:h2 "Oscillator"]
-    [knob {:cc 26 :label "Semitune" :min 0 :max 127}]])
+    [knob {:id :osc-1/semitones :label "Semitone"}]])
 
 (defn filter-panel []
   [:div.filter-panel
-    [:h2 "Filter"]])
+    [:h2 "Filter"]
+    [knob {:id :filter-1/frequency :label "Frequency"}]])
 
 (defn env-panel []
   [:div.env-panel
     [:h2 "Envelope"]
-    [knob {:cc [0 1] :label "Attack" :min 0 :max 127}]])
+    [knob {:id :env-2/attack :label "Attack"}]])
 
 (defn main-panel []
   (let [tab @(rf/subscribe [::panel])]
