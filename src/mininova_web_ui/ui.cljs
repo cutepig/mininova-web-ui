@@ -16,11 +16,19 @@
 
 (rf/reg-event-fx ::control
   [rf/debug]
-  (fn [fx [_ cc value midi?]]
-    (-> fx
-        (assoc-in [:db ::control cc] value)
-        ;; FIXME: (if-not midi?)
-        (assoc ::midi/midi [[176 cc value]]))))
+  (fn [fx [_ cc value from-midi?]]
+    (let [fx- (assoc-in fx [:db ::control cc] value)]
+      (if from-midi?
+        fx-
+        ;; If the event doesn't originate from midi, send it
+        (assoc fx- ::midi/midi
+          (if (vector? cc)
+            ;; NRPN
+            [[0xB0 0x63 (first cc)]
+             [0xB0 0x62 (second cc)]
+             [0xB0 0x06 value]]
+            ;; Regular CC
+            [[0xB0 cc value]]))))))
 
 (rf/reg-sub ::control
   (fn [db [_ cc]]
@@ -34,7 +42,10 @@
         "Osc"]
       [:li {:class (if (= tab :filter) "is-active")
             :on-click #(rf/dispatch [::panel :filter])}
-        "Filter"]]))
+        "Filter"]
+      [:li {:class (if (= tab :env) "is-active")
+            :on-click #(rf/dispatch [::panel :env])}
+        "Env"]]))
 
 (defn knob [{:keys [cc label min max]}]
   (let [value @(rf/subscribe [::control cc])]
@@ -55,6 +66,11 @@
   [:div.filter-panel
     [:h2 "Filter"]])
 
+(defn env-panel []
+  [:div.env-panel
+    [:h2 "Envelope"]
+    [knob {:cc [0 1] :label "Attack" :min 0 :max 127}]])
+
 (defn main-panel []
   (let [tab @(rf/subscribe [::panel])]
     [:main.main-panel
@@ -62,4 +78,5 @@
       (condp = tab
         :osc [osc-panel]
         :filter [filter-panel]
+        :env [env-panel]
         [:h2 "Select a panel"])]))
