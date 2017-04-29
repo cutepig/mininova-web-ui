@@ -1,4 +1,4 @@
-(ns mininova-ui.midi
+(ns mininova-web-ui.midi
   (:require [reagent.core :as reagent]
             [re-frame.core :as rf]))
 
@@ -72,10 +72,10 @@
                   :let [array (.from js/Uint8Array (clj->js msg))]]
             (do (println "Sending out" array)
                 (.send @output array))))))
-        
+
     (rf/reg-event-fx ::midi
       [rf/debug]
       (fn [cofx [_ cc val]]
         ;; TODO: Deconstruct this into MIDI values here?
         (assoc cofx ::midi [[176 cc val]])))))
-      
+

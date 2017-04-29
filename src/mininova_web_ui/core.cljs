@@ -1,11 +1,11 @@
-(ns mininova-ui.core
+(ns mininova-web-ui.core
   (:require [reagent.core :as reagent :refer [atom]]
-            [mininova-ui.midi :as midi]
-            [mininova-ui.ui :as ui]))
+            [mininova-web-ui.midi :as midi]
+            [mininova-web-ui.ui :as ui]))
 
 (enable-console-print!)
 
-(println "This text is printed from src/mininova-ui/core.cljs. Go ahead and edit it and see reloading in action.")
+(println "This text is printed from src/mininova-web-ui/core.cljs. Go ahead and edit it and see reloading in action.")
 
 ;; define your app data so that it doesn't get over-written on reload
 

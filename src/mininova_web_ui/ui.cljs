@@ -1,7 +1,7 @@
-(ns mininova-ui.ui
+(ns mininova-web-ui.ui
   (:require [reagent.core :as reagent]
             [re-frame.core :as rf]
-            [mininova-ui.midi :as midi]))
+            [mininova-web-ui.midi :as midi]))
 
 (def default-panel :osc)
 
@@ -62,5 +62,4 @@
       (condp = tab
         :osc [osc-panel]
         :filter [filter-panel]
-        nil)]))
-  
+        [:h2 "Select a panel"])]))
