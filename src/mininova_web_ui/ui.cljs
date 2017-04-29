@@ -15,25 +15,45 @@
   (fn [db _]
     (get db ::panel default-panel)))
 
+(defn send-midi [fx cc value from-midi?]
+  (if from-midi?
+    fx
+    ;; If the event doesn't originate from midi, send it
+    (assoc fx ::midi/midi
+      (if (vector? cc)
+        ;; NRPN
+        [[0xB0 0x63 (first cc)]
+         [0xB0 0x62 (second cc)]
+         [0xB0 0x06 value]]
+        ;; Regular CC
+        [[0xB0 cc value]]))))
+
+(defn set-multi-control [fx cc value params]
+  (let [id (->> params
+                (filter #(<= (first (:in %)) value (second (:in %))))
+                first
+                :id)]
+    (if (some? id)
+      (assoc-in fx [:db ::control id] value)
+      fx)))
+
+
+(defn set-control [fx id cc value]
+  (let [params (get params/cc->param cc)]
+    (if (= 1 (count params))
+      (assoc-in fx [:db ::control id] value)
+      (set-multi-control fx cc value params))))
+
 (rf/reg-event-fx ::control
   [rf/debug]
-  (fn [fx [_ cc value from-midi?]]
-    (let [fx- (assoc-in fx [:db ::control cc] value)]
-      (if from-midi?
-        fx-
-        ;; If the event doesn't originate from midi, send it
-        (assoc fx- ::midi/midi
-          (if (vector? cc)
-            ;; NRPN
-            [[0xB0 0x63 (first cc)]
-             [0xB0 0x62 (second cc)]
-             [0xB0 0x06 value]]
-            ;; Regular CC
-            [[0xB0 cc value]]))))))
+  (fn [fx [_ id cc value from-midi?]]
+    (-> fx
+        (set-control id cc value)
+        (send-midi cc value from-midi?))))
 
 (rf/reg-sub ::control
-  (fn [db [_ cc]]
-    (get-in db [::control cc])))
+  (fn [db [_ id]]
+    (get-in db [::control id])))
 
 (defn tabs []
   (let [tab @(rf/subscribe [::panel])]
@@ -59,7 +79,7 @@
 
 (defn knob [{:keys [id label]}]
   (let [param (get params/params id)
-        value @(rf/subscribe [::control (:cc param)])]
+        value @(rf/subscribe [::control id])]
     [:div.knob
       [:label label
         [:input {:id (str id)
@@ -67,17 +87,17 @@
                  :value value
                  :min (first (:in param))
                  :max (second (:in param))
-                 :on-change #(rf/dispatch [::control (:cc param) (.-currentTarget.value %)])}]
+                 :on-change #(rf/dispatch [::control id (:cc param) (.-currentTarget.value %)])}]
         [:span (map-in-out (:in param) (:out param) value)]]]))
 
 (defn select-enum [{:keys [id label]}]
   (let [param (get params/params id)
-        value @(rf/subscribe [::control (:cc param)])]
+        value @(rf/subscribe [::control id])]
     [:div.select-enum
       [:label label
         [:select {:id (str id)
                   :value (or value "")
-                  :on-change #(rf/dispatch [::control (:cc param) (.-currentTarget.value %)])}
+                  :on-change #(rf/dispatch [::control id (:cc param) (.-currentTarget.value %)])}
          [:option {:value "" :disabled true} label]
          (for [[val lbl] (map vector (range (first (:in param)) (inc (second (:in param)))) (:enum param))]
            ^{:key val}
@@ -85,12 +105,14 @@
 
 (defn toggle [{:keys [id label]}]
   (let [param (get params/params id)
-        value @(rf/subscribe [::control (:cc param)])]
+        value @(rf/subscribe [::control id])]
     [:div.toggle
       [:label label
         [:input {:type :checkbox
                  :checked (= value (second (:in param)))
-                 :on-change #(rf/dispatch [::control (:cc param) (if (.-currentTarget.checked %) (second (:in param)) (first (:in param)))])}]]]))
+                 :on-change #(rf/dispatch [::control id (:cc param) (if (.-currentTarget.checked %)
+                                                                      (second (:in param))
+                                                                      (first (:in param)))])}]]]))
 
 (defn osc-strip [index]
   (let [key #(keyword (str "osc-" index "/" %))]
@@ -139,7 +161,9 @@
              1 "Amp envelope"
              2 "Filter envelope"
              (str "Envelope " index))]
-      [knob {:id (key "delay") :label "Delay"}]
+      (if (<= 1 index 2)
+        [knob {:id (key "velocity") :label "Velocity"}]
+        [knob {:id (key "delay") :label "Delay"}])
       [knob {:id (key "attack") :label "Attack"}]
       [knob {:id (key "decay") :label "Decay"}]
       [knob {:id (key "sustain") :label "Sustain"}]

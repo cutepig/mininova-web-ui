@@ -716,3 +716,9 @@
    :global/input-gain {:cc [64 28] :in [21 97] :offset 0}
    :global/input-fx {:cc [64 30] :in [0 127] :offset 0}})
 
+(def cc->param
+  (->> params
+      (map #(assoc (second %) :id (first %)))
+      (group-by :cc)))
+
+(println ::cc->param cc->param)
