@@ -1,4 +1,4 @@
-(ns mininova-ui.ui
+(ns mininova-web-ui.ui
   (:require [reagent.core :as reagent]
             [re-frame.core :as rf]))
 
@@ -38,4 +38,4 @@
         :osc [osc-panel]
         :filter [filter-panel]
         [:h2 "Select a panel"])]))
-  
+

@@ -1,4 +1,4 @@
-(defproject mininova-ui "0.1.0-SNAPSHOT"
+(defproject mininova-web-ui "0.1.0-SNAPSHOT"
   :description "FIXME: write this!"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
@@ -12,7 +12,7 @@
                   :exclusions [org.clojure/tools.reader]]
                  [reagent "0.6.0"]
                  [re-frame "0.9.0"]]
-                 
+
   :plugins [[lein-figwheel "0.5.9"]
             [lein-cljsbuild "1.1.5" :exclusions [[org.clojure/clojure]]]]
 
@@ -27,16 +27,16 @@
                 ;; the presence of a :figwheel configuration here
                 ;; will cause figwheel to inject the figwheel client
                 ;; into your build
-                :figwheel {:on-jsload "mininova-ui.core/on-js-reload"
+                :figwheel {:on-jsload "mininova-web-ui.core/on-js-reload"
                            ;; :open-urls will pop open your application
                            ;; in the default browser once Figwheel has
                            ;; started and complied your application.
                            ;; Comment this out once it no longer serves you.
                            :open-urls ["http://localhost:3449/index.html"]}
 
-                :compiler {:main mininova-ui.core
+                :compiler {:main mininova-web-ui.core
                            :asset-path "js/compiled/out"
-                           :output-to "resources/public/js/compiled/mininova_ui.js"
+                           :output-to "resources/public/js/compiled/mininova_web_ui.js"
                            :output-dir "resources/public/js/compiled/out"
                            :source-map-timestamp true
                            ;; To console.log CLJS data-structures make sure you enable devtools in Chrome
@@ -47,8 +47,8 @@
                ;; lein cljsbuild once min
                {:id "min"
                 :source-paths ["src"]
-                :compiler {:output-to "resources/public/js/compiled/mininova_ui.js"
-                           :main mininova-ui.core
+                :compiler {:output-to "resources/public/js/compiled/mininova_web_ui.js"
+                           :main mininova-web-ui.core
                            :optimizations :advanced
                            :pretty-print false}}]}
 
@@ -86,7 +86,7 @@
 
              ;; to configure a different figwheel logfile path
              ;; :server-logfile "tmp/logs/figwheel-logfile.log"
-             
+
 
 
   ;; setting up nREPL for Figwheel and ClojureScript dev
