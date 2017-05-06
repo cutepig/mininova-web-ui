@@ -14,11 +14,33 @@
     (.forEach a #(.push v %))
     (js->clj v)))
 
+(defn on-nrpn [nrpn-v]
+  (let [msb (nth (first @nrpn-v) 2)
+        lsb (nth (second @nrpn-v) 2)
+        value (nth (nth @nrpn-v 2) 2)]
+    (rf/dispatch [::cc [0xb0 [msb lsb] value]])
+    (reset! nrpn-v [])))
+
+(defn on-cc [nrpn-v data]
+  ;; Check if we are in the middle of NRPN message
+  (if (< 0 (count @nrpn-v))
+    (do
+      (swap! nrpn-v conj data)
+      ;; TODO: Handle 4 len vector
+      (if (= 3 (count @nrpn-v))
+        (on-nrpn nrpn-v)))
+    ;; Check first NRPN message
+    (if (= 0x63 (second data))
+      (swap! nrpn-v conj data)
+      (rf/dispatch [::cc data]))))
+
+(def nrpn-v (atom []))
+
 (defn on-midi-message [data]
   (println ::on-midi-message data)
   (let [status (first data)]
     (condp = status
-      0xb0 (rf/dispatch [::cc data])
+      0xb0 (on-cc nrpn-v data)
       0xc0 (rf/dispatch [::patch data])
       0xf0 (rf/dispatch [::sysex data])
       nil)))
