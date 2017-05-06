@@ -14,9 +14,18 @@
     (.forEach a #(.push v %))
     (js->clj v)))
 
+(defn on-midi-message [data]
+  (println ::on-midi-message data)
+  (let [status (first data)]
+    (condp = status
+      0xb0 (rf/dispatch [::cc data])
+      0xc0 (rf/dispatch [::patch data])
+      0xf0 (rf/dispatch [::sysex data])
+      nil)))
+
 (defn connect-input! [input port]
   (println "MiniNova input is now connected")
-  (set! (.-onmidimessage port) #(println (Array->clj (.-data %))))
+  (set! (.-onmidimessage port) #(on-midi-message (Array->clj (.-data %))))
   (reset! input port))
 
 (defn disconnect-input! [input]
@@ -30,8 +39,6 @@
 (defn disconnect-output! [output]
   (println "MiniNova output is now disconnected")
   (reset! output nil))
-
-; ..
 
 (defn configure-ports [input-atom output-atom midi-access]
   (let [input-port (->> (Map->clj (.-inputs midi-access))
@@ -61,7 +68,7 @@
                          (reset! midi-access ma)
                          (set! (.-onstatechange ma) on-state-change)
                          (configure-ports input output ma))]
-    (-> (js/navigator.requestMIDIAccess #js {:sysex false})
+    (-> (js/navigator.requestMIDIAccess #js {:sysex true})
       (.then on-midi-access)
       (.catch #(println "MIDI access denied" %)))
 
