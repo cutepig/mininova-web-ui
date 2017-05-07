@@ -67,13 +67,13 @@
 
 (def params
   {:voice/polyphony-mode {:cc 3 :in [0 4] :enum ["Mono" "Mono AG" "Poly 1" "Poly 2" "Mono 2"] :offset 34}
-   :voice/portamento-rate {:cc 5 :in [0 127]}
-   :voice/pre-glide {:cc 9 :in [52 76] :out [-12 12]}
-   :voice/portamento-mode {:cc 12 :in [0 1] :enum ["Expo" "Linear"]}
+   :voice/portamento-rate {:cc 5 :in [0 127] :offset 35}
+   :voice/pre-glide {:cc 9 :in [52 76] :out [-12 12] :offset 36}
+   :voice/portamento-mode {:cc 12 :in [0 1] :enum ["Expo" "Linear"] :offset 37}
    ;; FIXME: Handle this range properly
    :voice/keyboard-octave {:cc 13 :in [124 4] :out [-4 4] :offset 0}
-   :voice/unison {:cc 14 :in [0 4] :enum ["Off" 1 2 3 4]}
-   :voice/unison-detune {:cc 15 :in [0 127]}
+   :voice/unison {:cc 14 :in [0 4] :enum ["Off" 1 2 3 4] :offset 39}
+   :voice/unison-detune {:cc 15 :in [0 127] :offset 40}
 
    :midi/modulation {:cc 1 :in [0 127] :offset 0}
    :midi/breath-controller {:cc 2 :in [0 127] :offset 0}
@@ -136,16 +136,16 @@
    :osc-3/cents {:cc 49 :in [0 127] :out [-64 63] :offset 74}
    :osc-3/pitch-bend {:cc 50 :in [52 76] :out [-12 12] :offset 75}
 
-   :mixer/wet-level {:cc 8 :in [0 127]}
-   :mixer/osc-1-level {:cc 51 :in [0 127]}
-   :mixer/osc-2-level {:cc 52 :in [0 127]}
-   :mixer/osc-3-level {:cc 53 :in [0 127]}
-   :mixer/ring-mod-13-level {:cc 54 :in [0 127]}
-   :mixer/ring-mod-23-level {:cc 55 :in [0 127]}
-   :mixer/noise-level {:cc 56 :in [0 127]}
-   :mixer/noise-colour {:cc 57 :in [0 3] :enum ["White" "High" "Band" "HiBand"]}
-   :mixer/pre-fx-level {:cc 58 :in [52 82] :out [-12 18]}
-   :mixer/post-fx-level {:cc 59 :in [52 82] :out [-12 18]}
+   :mixer/wet-level {:cc 8 :in [0 127] :offset 85}
+   :mixer/osc-1-level {:cc 51 :in [0 127] :offset 76}
+   :mixer/osc-2-level {:cc 52 :in [0 127] :offset 77}
+   :mixer/osc-3-level {:cc 53 :in [0 127] :offset 78}
+   :mixer/ring-mod-13-level {:cc 54 :in [0 127] :offset 79}
+   :mixer/ring-mod-23-level {:cc 55 :in [0 127] :offset 80}
+   :mixer/noise-level {:cc 56 :in [0 127] :offset 81}
+   :mixer/noise-colour {:cc 57 :in [0 3] :enum ["White" "High" "Band" "HiBand"] :offset 82}
+   :mixer/pre-fx-level {:cc 58 :in [52 82] :out [-12 18] :offset 83}
+   :mixer/post-fx-level {:cc 59 :in [52 82] :out [-12 18] :offset 84}
 
    :filter/routing {:cc 60 :in [0 5] :enum ["Bypass" "Single" "Series" "Parallel" "Parallal" "Drum"] :offset 86}
    :filter/balance {:cc 61 :in [0 127] :out [-64 63] :offset 87}
@@ -182,7 +182,7 @@
    :animate-7/hold {:cc [60 6] :in [0 127] :offset 0}
    :animate-8/hold {:cc [60 7] :in [0 127] :offset 0}
 
-   :env/track-centre {:cc 106 :in [0 127]}
+   :env/track-centre {:cc 106 :in [0 127] :offset 113}
 
    :env-1/sustain {:cc 70 :in [0 127] :offset 118}
    :env-1/release {:cc 72 :in [0 127] :offset 119}
@@ -321,167 +321,168 @@
    :lfo-3/common-sync {:cc [0 122] :in [36 37] :enum ["Normal" "Common"] :offset 225}
    :lfo-3/delay-trigger {:cc [0 122] :in [38 39] :enum ["Single" "Multi"] :offset 225}
    ;; NOTE: Docs say :in [4 7] but thats lfo-2/fade-mode
-   :lfo-3/fade-mode {:cc [1 123] :in [8 11] :enum ["Fade In" "Fade Out" "Gate In" "Gate Out"]}
+   :lfo-3/fade-mode {:cc [1 123] :in [8 11] :enum ["Fade In" "Fade Out" "Gate In" "Gate Out"] :offset 379}
 
-   :fx-pan/position {:cc 10 :in [0 127] :out [-64 63]}
-   :fx-pan/rate {:cc 88 :in [0 127]}
-   :fx-pan/sync {:cc 89 :in [0 35] :enum sync-enum}
-   :fx-pan/mod-depth {:cc 90 :in [0 127]}
+   :fx-pan/position {:cc 10 :in [0 127] :out [-64 63] :offset 105}
+   :fx-pan/rate {:cc 88 :in [0 127] :offset 106}
+   :fx-pan/sync {:cc 89 :in [0 35] :enum sync-enum :offset 107}
+   :fx-pan/mod-depth {:cc 90 :in [0 127] :offset 108}
 
-   :fx/routing {:cc [0 97] :in [0 7]} ;; TODO: Enum
-   :fx/feedback {:cc [0 98] :in [0 127]}
+   :fx/routing {:cc [0 97] :in [0 7] :offset 226} ;; TODO: Enum
+   :fx/feedback {:cc [0 98] :in [0 127] :offset 227}
 
-   :fx-1/level {:cc 91 :in [0 127]}
-   :fx-1/select {:cc [0 99] :in [0 14] :enum fx-select-enum}
+   :fx-1/level {:cc 91 :in [0 127] :offset 233}
+   :fx-1/select {:cc [0 99] :in [0 14] :enum fx-select-enum :offset 228}
 
-   :fx-2/level {:cc 92 :in [0 127]}
-   :fx-2/select {:cc [0 100] :in [0 14] :enum fx-select-enum}
+   :fx-2/level {:cc 92 :in [0 127] :offset 234}
+   :fx-2/select {:cc [0 100] :in [0 14] :enum fx-select-enum :offset 229}
 
-   :fx-3/level {:cc 93 :in [0 127]}
-   :fx-3/select {:cc [0 101] :in [0 14] :enum fx-select-enum}
+   :fx-3/level {:cc 93 :in [0 127] :offset 235}
+   :fx-3/select {:cc [0 101] :in [0 14] :enum fx-select-enum :offset 230}
 
-   :fx-4/level {:cc 94 :in [0 127]}
-   :fx-5/level {:cc 95 :in [0 127]}
+   :fx-4/level {:cc 94 :in [0 127] :offset 236}
+   :fx-4/select {:cc [0 102] :in [0 14] :enum fx-select-enum :offset 231}
 
-   :fx-4/select {:cc [0 102] :in [0 14] :enum fx-select-enum}
-   :fx-5/select {:cc [0 103] :in [0 14] :enum fx-select-enum}
+   :fx-5/level {:cc 95 :in [0 127] :offset 237}
+   :fx-5/select {:cc [0 103] :in [0 14] :enum fx-select-enum :offset 232}
 
-   :equaliser/bass-frequency {:cc [0 104] :in [0 127]}
-   :equaliser/bass-level {:cc [0 105] :in [0 127] :out [-64 63]}
-   :equaliser/mid-frequency {:cc [0 106] :in [0 127]}
-   :equaliser/mid-level {:cc [0 107] :in [0 127] :out [-64 63]}
-   :equaliser/treble-frequency {:cc [0 108] :in [0 127]}
-   :equaliser/treble-level {:cc [0 109] :in [0 127] :out [-64 63]}
+   :equaliser/bass-frequency {:cc [0 104] :in [0 127] :offset 238}
+   :equaliser/bass-level {:cc [0 105] :in [0 127] :out [-64 63] :offset 239}
+   :equaliser/mid-frequency {:cc [0 106] :in [0 127] :offset 240}
+   :equaliser/mid-level {:cc [0 107] :in [0 127] :out [-64 63] :offset 241}
+   :equaliser/treble-frequency {:cc [0 108] :in [0 127] :offset 242}
+   :equaliser/treble-level {:cc [0 109] :in [0 127] :out [-64 63] :offset 243}
 
-   :compressor-1/ratio {:cc [0 110] :in [0 127]}
-   :compressor-1/treshold {:cc [0 111] :in [0 60] :out [-60 0]}
-   :compressor-1/attack {:cc [0 112] :in [0 127]}
-   :compressor-1/release {:cc [0 113] :in [0 127]}
-   :compressor-1/hold {:cc [0 114] :in [0 127]}
-   :compressor-1/gain {:cc [0 115] :in [0 127]}
+   :compressor-1/ratio {:cc [0 110] :in [0 127] :offset 244}
+   :compressor-1/treshold {:cc [0 111] :in [0 60] :out [-60 0] :offset 245}
+   :compressor-1/attack {:cc [0 112] :in [0 127] :offset 246}
+   :compressor-1/release {:cc [0 113] :in [0 127] :offset 247}
+   :compressor-1/hold {:cc [0 114] :in [0 127] :offset 248}
+   :compressor-1/gain {:cc [0 115] :in [0 127] :offset 249}
 
-   :compressor-2/ratio {:cc [0 116] :in [0 127]}
-   :compressor-2/treshold {:cc [0 117] :in [0 60] :out [-60 0]}
-   :compressor-2/attack {:cc [0 118] :in [0 127]}
-   :compressor-2/release {:cc [0 119] :in [0 127]}
-   :compressor-2/hold {:cc [0 120] :in [0 127]}
-   :compressor-2/gain {:cc [0 121] :in [0 127]}
+   :compressor-2/ratio {:cc [0 116] :in [0 127] :offset 250}
+   :compressor-2/treshold {:cc [0 117] :in [0 60] :out [-60 0] :offset 251}
+   :compressor-2/attack {:cc [0 118] :in [0 127] :offset 252}
+   :compressor-2/release {:cc [0 119] :in [0 127] :offset 253}
+   :compressor-2/hold {:cc [0 120] :in [0 127] :offset 254}
+   :compressor-2/gain {:cc [0 121] :in [0 127] :offset 255}
 
    :distortion-1/type {:cc [1 0] :in [0 6] :enum ["Diode" "Valve" "Clipper" "XOver" "Rectify" "BitsDown" "RateDown"] :offset 256}
    :distortion-1/compensation {:cc [1 1] :in [0 127] :offset 257}
-   :distortion-1/level {:cc [1 2] :in [52 82] :out [-12 18]}
+   :distortion-1/level {:cc [1 2] :in [52 82] :out [-12 18] :offset 258}
 
-   :distortion-2/type {:cc [1 3] :in [0 6] :enum ["Diode" "Valve" "Clipper" "XOver" "Rectify" "BitsDown" "RateDown"]}
-   :distortion-2/compensation {:cc [1 4] :in [0 127]}
-   :distortion-2/level {:cc [1 5] :in [52 82] :out [-12 18]}
+   :distortion-2/type {:cc [1 3] :in [0 6] :enum ["Diode" "Valve" "Clipper" "XOver" "Rectify" "BitsDown" "RateDown"] :offset 259}
+   :distortion-2/compensation {:cc [1 4] :in [0 127] :offset 260}
+   :distortion-2/level {:cc [1 5] :in [52 82] :out [-12 18] :offset 261}
 
-   :delay-1/time {:cc [1 6] :in [0 127]}
-   :delay-1/time-sync {:cc [1 7] :in [0 35]} ;; TODO: Enum
-   :delay-1/feedback {:cc [1 8] :in [0 127]}
-   :delay-1/width {:cc [1 9] :in [0 127]}
-   :delay-1/lr-ratio {:cc [1 10] :in [0 12]} ;; TODO: Enum
-   :delay-1/slew-rate {:cc [1 11] :in [0 127]}
+   :delay-1/time {:cc [1 6] :in [0 127] :offset 262}
+   :delay-1/time-sync {:cc [1 7] :in [0 35] :offset 263} ;; TODO: Enum
+   :delay-1/feedback {:cc [1 8] :in [0 127] :offset 264}
+   :delay-1/width {:cc [1 9] :in [0 127] :offset 265}
+   :delay-1/lr-ratio {:cc [1 10] :in [0 12] :offset 266} ;; TODO: Enum
+   :delay-1/slew-rate {:cc [1 11] :in [0 127] :offset 267}
 
-   :delay-2/time {:cc [1 12] :in [0 127]}
-   :delay-2/time-sync {:cc [1 13] :in [0 35]} ;; TODO: Enum
-   :delay-2/feedback {:cc [1 14] :in [0 127]}
-   :delay-2/width {:cc [1 15] :in [0 127]}
-   :delay-2/lr-ratio {:cc [1 16] :in [0 12]} ;; TODO: Enum
-   :delay-2/slew-rate {:cc [1 17] :in [0 127]}
+   :delay-2/time {:cc [1 12] :in [0 127] :offset 268}
+   :delay-2/time-sync {:cc [1 13] :in [0 35] :offset 269} ;; TODO: Enum
+   :delay-2/feedback {:cc [1 14] :in [0 127] :offset 270}
+   :delay-2/width {:cc [1 15] :in [0 127] :offset 271}
+   :delay-2/lr-ratio {:cc [1 16] :in [0 12] :offset 272} ;; TODO: Enum
+   :delay-2/slew-rate {:cc [1 17] :in [0 127] :offset 273}
 
-   :reverb-1/type {:cc [1 18] :in [0 5] :enum ["Chamber" "SmlRoom" "Lrgroom" "SmlHall" "LrgHall" "GrtHall"]}
-   :reverb-1/decay {:cc [1 19] :in [0 127]}
-   :reverb-1/damping {:cc [1 20] :in [0 127]}
+   :reverb-1/type {:cc [1 18] :in [0 5] :enum ["Chamber" "SmlRoom" "Lrgroom" "SmlHall" "LrgHall" "GrtHall"] :offset 274}
+   :reverb-1/decay {:cc [1 19] :in [0 127] :offset 275}
+   :reverb-1/damping {:cc [1 20] :in [0 127] :offset 276}
 
-   :reverb-2/type {:cc [1 21] :in [0 5] :enum ["Chamber" "SmlRoom" "Lrgroom" "SmlHall" "LrgHall" "GrtHall"]}
-   :reverb-2/decay {:cc [1 22] :in [0 127]}
-   :reverb-2/damping {:cc [1 23] :in [0 127]}
+   :reverb-2/type {:cc [1 21] :in [0 5] :enum ["Chamber" "SmlRoom" "Lrgroom" "SmlHall" "LrgHall" "GrtHall"] :offset 277}
+   :reverb-2/decay {:cc [1 22] :in [0 127] :offset 278}
+   :reverb-2/damping {:cc [1 23] :in [0 127] :offset 279}
 
-   :chorus-1/type {:cc [1 24] :in [0 1] :enum ["Phaser" "Chorus"]}
-   :chorus-1/rate {:cc [1 25] :in [0 127]}
-   :chorus-1/rate-sync {:cc [1 26] :in [0 35]} ;; TODO: Enum
-   :chorus-1/feedback {:cc [1 27] :in [0 127] :out [-64 63]}
-   :chorus-1/mod-depth {:cc [1 28] :in [0 127]}
-   :chorus-1/delay {:cc [1 29] :in [0 127]}
+   :chorus-1/type {:cc [1 24] :in [0 1] :enum ["Phaser" "Chorus"] :offset 280}
+   :chorus-1/rate {:cc [1 25] :in [0 127] :offset 281}
+   :chorus-1/rate-sync {:cc [1 26] :in [0 35] :offset 282} ;; TODO: Enum
+   :chorus-1/feedback {:cc [1 27] :in [0 127] :out [-64 63] :offset 283}
+   :chorus-1/mod-depth {:cc [1 28] :in [0 127] :offset 284}
+   :chorus-1/delay {:cc [1 29] :in [0 127] :offset 285}
 
-   :chorus-2/type {:cc [1 30] :in [0 1] :enum ["Phaser" "Chorus"]}
-   :chorus-2/rate {:cc [1 31] :in [0 127]}
+   :chorus-2/type {:cc [1 30] :in [0 1] :enum ["Phaser" "Chorus"] :offset 286}
+   :chorus-2/rate {:cc [1 31] :in [0 127] :offset 287}
    :chorus-2/rate-sync {:cc [1 32] :in [0 35] :offset 288} ;; TODO: Enum
    :chorus-2/feedback {:cc [1 33] :in [0 127] :out [-64 63] :offset 289}
-   :chorus-2/mod-depth {:cc [1 34] :in [0 127]}
-   :chorus-2/delay {:cc [1 35] :in [0 127]}
+   :chorus-2/mod-depth {:cc [1 34] :in [0 127] :offset 290}
+   :chorus-2/delay {:cc [1 35] :in [0 127] :offset 291}
 
-   :chorus-3/type {:cc [1 36] :in [0 1] :enum ["Phaser" "Chorus"]}
-   :chorus-3/rate {:cc [1 37] :in [0 127]}
-   :chorus-3/rate-sync {:cc [1 38] :in [0 35]} ;; TODO: Enum
-   :chorus-3/feedback {:cc [1 39] :in [0 127] :out [-64 63]}
-   :chorus-3/mod-depth {:cc [1 40] :in [0 127]}
-   :chorus-3/delay {:cc [1 41] :in [0 127]}
+   :chorus-3/type {:cc [1 36] :in [0 1] :enum ["Phaser" "Chorus"] :offset 292}
+   :chorus-3/rate {:cc [1 37] :in [0 127] :offset 293}
+   :chorus-3/rate-sync {:cc [1 38] :in [0 35] :offset 294} ;; TODO: Enum
+   :chorus-3/feedback {:cc [1 39] :in [0 127] :out [-64 63] :offset 295}
+   :chorus-3/mod-depth {:cc [1 40] :in [0 127] :offset 296}
+   :chorus-3/delay {:cc [1 41] :in [0 127] :offset 297}
 
-   :chorus-4/type {:cc [1 42] :in [0 1] :enum ["Phaser" "Chorus"]}
-   :chorus-4/rate {:cc [1 43] :in [0 127]}
-   :chorus-4/rate-sync {:cc [1 44] :in [0 35]} ;; TODO: Enum
-   :chorus-4/feedback {:cc [1 45] :in [0 127] :out [-64 63]}
-   :chorus-4/mod-depth {:cc [1 46] :in [0 127]}
-   :chorus-4/delay {:cc [1 47] :in [0 127]}
+   :chorus-4/type {:cc [1 42] :in [0 1] :enum ["Phaser" "Chorus"] :offset 298}
+   :chorus-4/rate {:cc [1 43] :in [0 127] :offset 299}
+   :chorus-4/rate-sync {:cc [1 44] :in [0 35] :offset 300} ;; TODO: Enum
+   :chorus-4/feedback {:cc [1 45] :in [0 127] :out [-64 63] :offset 301}
+   :chorus-4/mod-depth {:cc [1 46] :in [0 127] :offset 302}
+   :chorus-4/delay {:cc [1 47] :in [0 127] :offset 303}
 
    :gator/on {:cc [0 122] :in [52 53] :enum ["Off" "On"]}
-   :gator/key-sync {:cc [0 122] :in [54 55] :enum ["FreeRun" "KeySync"]}
-   :gator/key-latch {:cc [0 122] :in [56 57] :enum ["LatchOff" "LatchOn"]}
+   :gator/key-sync {:cc [0 122] :in [54 55] :enum ["FreeRun" "KeySync"] :offset 304}
+   :gator/key-latch {:cc [0 122] :in [56 57] :enum ["LatchOff" "LatchOn"] :offset 304}
    :gator/rate-sync {:cc [1 49] :in [0 35]} ;; TODO: Enum
    :gator/mode {:cc [1 50] :in [0 5] :enum ["Mono16" "MonoAlt1" "MonoAlt2" "Stereo16" "SterAlt" "SterAlt2"]}
-   :gator/edge-slew {:cc [1 52] :in [0 127]}
-   :gator/hold {:cc [1 53] :in [0 127]}
+   :gator/edge-slew {:cc [1 52] :in [0 127] :offset 308}
+   :gator/hold {:cc [1 53] :in [0 127] :offset 309}
    :gator/lr-delay {:cc [1 54] :in [0 127] :out [-64 63]}
-   :gator/level-1 {:cc [5 0] :in [0 7]}
-   :gator/level-2 {:cc [5 1] :in [0 7]}
-   :gator/level-3 {:cc [5 2] :in [0 7]}
-   :gator/level-4 {:cc [5 3] :in [0 7]}
-   :gator/level-5 {:cc [5 4] :in [0 7]}
-   :gator/level-6 {:cc [5 5] :in [0 7]}
-   :gator/level-7 {:cc [5 6] :in [0 7]}
-   :gator/level-8 {:cc [5 7] :in [0 7]}
-   :gator/level-9 {:cc [5 8] :in [0 7]}
-   :gator/level-10 {:cc [5 9] :in [0 7]}
-   :gator/level-11 {:cc [5 10] :in [0 7]}
-   :gator/level-12 {:cc [5 11] :in [0 7]}
-   :gator/level-13 {:cc [5 12] :in [0 7]}
-   :gator/level-14 {:cc [5 13] :in [0 7]}
-   :gator/level-15 {:cc [5 14] :in [0 7]}
-   :gator/level-16 {:cc [5 15] :in [0 7]}
-   :gator/level-17 {:cc [5 16] :in [0 7]}
-   :gator/level-18 {:cc [5 17] :in [0 7]}
-   :gator/level-19 {:cc [5 18] :in [0 7]}
-   :gator/level-20 {:cc [5 19] :in [0 7]}
-   :gator/level-21 {:cc [5 20] :in [0 7]}
-   :gator/level-22 {:cc [5 21] :in [0 7]}
-   :gator/level-23 {:cc [5 22] :in [0 7]}
-   :gator/level-24 {:cc [5 23] :in [0 7]}
-   :gator/level-25 {:cc [5 24] :in [0 7]}
-   :gator/level-26 {:cc [5 25] :in [0 7]}
-   :gator/level-27 {:cc [5 26] :in [0 7]}
-   :gator/level-28 {:cc [5 27] :in [0 7]}
-   :gator/level-29 {:cc [5 28] :in [0 7]}
+   :gator/level-1 {:cc [5 0] :in [0 7] :offset 451}
+   :gator/level-2 {:cc [5 1] :in [0 7] :offset 452}
+   :gator/level-3 {:cc [5 2] :in [0 7] :offset 453}
+   :gator/level-4 {:cc [5 3] :in [0 7] :offset 454}
+   :gator/level-5 {:cc [5 4] :in [0 7] :offset 455}
+   :gator/level-6 {:cc [5 5] :in [0 7] :offset 456}
+   :gator/level-7 {:cc [5 6] :in [0 7] :offset 457}
+   :gator/level-8 {:cc [5 7] :in [0 7] :offset 458}
+   :gator/level-9 {:cc [5 8] :in [0 7] :offset 459}
+   :gator/level-10 {:cc [5 9] :in [0 7] :offset 460}
+   :gator/level-11 {:cc [5 10] :in [0 7] :offset 461}
+   :gator/level-12 {:cc [5 11] :in [0 7] :offset 462}
+   :gator/level-13 {:cc [5 12] :in [0 7] :offset 463}
+   :gator/level-14 {:cc [5 13] :in [0 7] :offset 464}
+   :gator/level-15 {:cc [5 14] :in [0 7] :offset 465}
+   :gator/level-16 {:cc [5 15] :in [0 7] :offset 466}
+   :gator/level-17 {:cc [5 16] :in [0 7] :offset 467}
+   :gator/level-18 {:cc [5 17] :in [0 7] :offset 468}
+   :gator/level-19 {:cc [5 18] :in [0 7] :offset 469}
+   :gator/level-20 {:cc [5 19] :in [0 7] :offset 470}
+   :gator/level-21 {:cc [5 20] :in [0 7] :offset 471}
+   :gator/level-22 {:cc [5 21] :in [0 7] :offset 472}
+   :gator/level-23 {:cc [5 22] :in [0 7] :offset 473}
+   :gator/level-24 {:cc [5 23] :in [0 7] :offset 474}
+   :gator/level-25 {:cc [5 24] :in [0 7] :offset 475}
+   :gator/level-26 {:cc [5 25] :in [0 7] :offset 476}
+   :gator/level-27 {:cc [5 26] :in [0 7] :offset 477}
+   :gator/level-28 {:cc [5 27] :in [0 7] :offset 478}
+   :gator/level-29 {:cc [5 28] :in [0 7] :offset 479}
    :gator/level-30 {:cc [5 29] :in [0 7] :offset 480}
-   :gator/level-31 {:cc [5 30] :in [0 7]}
-   :gator/level-32 {:cc [5 31] :in [0 7] :offset 481}
+   :gator/level-31 {:cc [5 30] :in [0 7] :offset 481}
+   :gator/level-32 {:cc [5 31] :in [0 7] :offset 482}
 
-   :vocoder/on {:cc [0 122] :in [58 59] :enum ["Off" "On"]}
-   :vocoder/sibilance-type {:cc [0 122] :in [60 61] :enum ["HiPass" "Noise"]}
+   ;; TODO: Encoding
+   :vocoder/on {:cc [0 122] :in [58 59] :enum ["Off" "On"] :offset 311}
+   :vocoder/sibilance-type {:cc [0 122] :in [60 61] :enum ["HiPass" "Noise"] :offset 311}
    :vocoder/freeze {:cc [0 122] :in [62 63] :enum ["UnFreeze" "Freeze"]}
-   :vocoder/all-max {:cc [0 122] :in [64 65] :enum ["AllMax Off" "AllMax On"]}
-   :vocoder/vocoder-input {:cc [0 122] :in [66 67] :enum ["Audio In" "VTOutput"]}
-   :vocoder/width {:cc [1 57] :in [0 127]}
-   :vocoder/sibilance {:cc [1 58] :in [0 127]}
-   :vocoder/spec-shift {:cc [1 59] :in [0 127] :out [-64 63]}
-   :vocoder/spec-spread {:cc [1 60] :in [0 127] :out [-64 63]}
-   :vocoder/level {:cc [1 71] :in [0 127]}
-   :vocoder/carrier-level {:cc [1 72] :in [0 127]}
-   :vocoder/modulator-level {:cc [1 73] :in [0 127]}
-   :vocoder/resonance {:cc [1 74] :in [0 127]}
-   :vocoder/decay {:cc [1 75] :in [0 127]}
-   :vocoder/gate-treshold {:cc [1 76] :in [0 96] :out [-96 0]}
-   :vocoder/gate-release {:cc [1 77] :in [0 127]}
+   :vocoder/all-max {:cc [0 122] :in [64 65] :enum ["AllMax Off" "AllMax On"] :offset 311}
+   :vocoder/vocoder-input {:cc [0 122] :in [66 67] :enum ["Audio In" "VTOutput"] :offset 311}
+   :vocoder/width {:cc [1 57] :in [0 127] :offset 313}
+   :vocoder/sibilance {:cc [1 58] :in [0 127] :offset 314}
+   :vocoder/spec-shift {:cc [1 59] :in [0 127] :out [-64 63] :offset 315}
+   :vocoder/spec-spread {:cc [1 60] :in [0 127] :out [-64 63] :offset 316}
+   :vocoder/level {:cc [1 71] :in [0 127] :offset 327}
+   :vocoder/carrier-level {:cc [1 72] :in [0 127] :offset 328}
+   :vocoder/modulator-level {:cc [1 73] :in [0 127] :offset 329}
+   :vocoder/resonance {:cc [1 74] :in [0 127] :offset 330}
+   :vocoder/decay {:cc [1 75] :in [0 127] :offset 331}
+   :vocoder/gate-treshold {:cc [1 76] :in [0 96] :out [-96 0] :offset 332}
+   :vocoder/gate-release {:cc [1 77] :in [0 127] :offset 333}
    :vocoder/spectrum-level-1 {:cc [6 0] :in [0 127] :offset 0}
    :vocoder/spectrum-level-2 {:cc [6 1] :in [0 127] :offset 0}
    :vocoder/spectrum-level-3 {:cc [6 2] :in [0 127] :offset 0}
@@ -516,8 +517,8 @@
    :vocoder/spectrum-level-32 {:cc [6 31] :in [0 127] :offset 0}
    :vocoder/spectrum-resample {:cc [6 32] :in [1 1] :offset 0}
 
-   :chorder/transpose {:cc [1 78] :in [53 75] :out [-11 11]}
-   :chorder/on {:cc [1 79] :in [0 1] :enum ["Off" "On"]}
+   :chorder/transpose {:cc [1 78] :in [53 75] :out [-11 11] :offset 334}
+   :chorder/on {:cc [1 79] :in [0 1] :enum ["Off" "On"] :offset 335}
    ;; FIXME: Hangs
    :chorder/chorder-count {:cc [7 16] :in [0 10] :offset 0}
    ;; FIXME: is it 0-127, 0,127 or 0-1?
@@ -531,28 +532,24 @@
    :chorder/chorder-key-9 {:cc [7 24] :in [0 127] :offset 0}
    :chorder/chorder-key-10 {:cc [7 25] :in [0 127] :offset 0}
 
-   :vocal-tune/shift {:cc [1 80] :in [40 88] :out [-24 24]}
-   :vocal-tune/bend {:cc [1 81] :in [40 88] :out [-24 24]}
-   ;; NOTE: Collides with mod-matrix-9/source-1 (0-18) ?! doesn't collide with (0-11) in lfo-n/fade-mode
-   :vocal-tune/mode {:cc [1 123] :in [16 19] :enum ["Off" "Scale Correction" "KBCtrl" "Pitch"]}
-   ;; NOTE: Doesn't collide with (0-11) in lfo-n/fade-mode or (16-19)
-   :vocal-tune/insert {:cc [1 123] :in [25 27] :enum ["PreFilter" "PostFilter" "PreFx"]}
-   :vocal-tune/scale-type {:cc [2 56] :in [0 5] :enum ["Played" "Chromatic" "Major" "NatMinor" "HarMinor" "MelMinor"]}
-   :vocal-tune/scale-key {:cc [2 57] :in [0 11] :enum ["C" "C#" "D" "D#" "E" "F" "F#" "G" "G#" "A" "A#" "B"]}
-   :vocal-tune/correction-time {:cc [2 58] :in [0 127]}
-   :vocal-tune/level {:cc [2 59] :in [0 127]}
-   :vocal-tune/vibrato {:cc [2 60] :in [0 127]}
-   :vocal-tune/vibrato-mod-wheel {:cc [2 61] :in [0 127]}
-   :vocal-tune/vibrato-rate {:cc [2 62] :in [0 127]}
+   :vocal-tune/shift {:cc [1 80] :in [40 88] :out [-24 24] :offset 336}
+   :vocal-tune/bend {:cc [1 81] :in [40 88] :out [-24 24] :offset 337}
+   ;; FIXME: Encoding
+   :vocal-tune/mode {:cc [0 123] :in [16 19] :enum ["Off" "Scale Correction" "KBCtrl" "Pitch"] :offset 439}
+   :vocal-tune/insert {:cc [0 123] :in [25 27] :enum ["PreFilter" "PostFilter" "PreFx"] :offset 439}
+   :vocal-tune/scale-type {:cc [2 56] :in [0 5] :enum ["Played" "Chromatic" "Major" "NatMinor" "HarMinor" "MelMinor"] :offset 440}
+   :vocal-tune/scale-key {:cc [2 57] :in [0 11] :enum ["C" "C#" "D" "D#" "E" "F" "F#" "G" "G#" "A" "A#" "B"] :offset 441}
+   :vocal-tune/correction-time {:cc [2 58] :in [0 127] :offset 442}
+   :vocal-tune/level {:cc [2 59] :in [0 127] :offset 443}
+   :vocal-tune/vibrato {:cc [2 60] :in [0 127] :offset 444}
+   :vocal-tune/vibrato-mod-wheel {:cc [2 61] :in [0 127] :offset 445}
+   :vocal-tune/vibrato-rate {:cc [2 62] :in [0 127] :offset 446}
 
-   ;; TODO: Figure out the encoding @ 317
-   ;; FIXME: Modifying either `on` or `key-latch` changes both in the store because they share
-   ;; the `cc`. Make `::ui/control` action smarter about this
+   ;; FIXME: Encoding
    :arp/on {:cc [0 122] :in [46 47] :enum ["Off" "On"] :offset 317}
    :arp/key-latch {:cc [0 122] :in [50 51] :enum ["Latch Off" "Latch On"] :offset 317}
    :arp/octaves {:cc [1 62] :in [0 3] :out [1 4] :offset 318}
    :arp/rate-sync {:cc [1 63] :in [0 18] :enum arp-pattern-enum :offset 319}
-   ;; FIXME: This was detected at 320 AND 325?
    :arp/gate {:cc [1 64] :in [1 127] :offset 320}
    :arp/mode {:cc [1 65] :in [0 6] :enum ["Up" "Down" "UpDown" "UpDown2" "Played" "Random" "Chord"] :offset 321}
    :arp/pattern {:cc [1 66] :in [0 18] :enum arp-pattern-enum :offset 322}
@@ -561,9 +558,8 @@
    ;; :arp/mini-nova {:cc [127 127] :in [0 1] :offset 0}
    :arp/length {:cc [60 40] :in [2 8] :offset 325}
 
-   ;; FIXME: step 1 was detected at 325?!
    ;; TODO: Figure out the encoding @ 326
-   :arp-1/step {:cc [60 32], :in [0 1], :offset 326},
+   :arp-1/step {:cc [60 32], :in [0 1], :offset 325},
    :arp-2/step {:cc [60 33], :in [0 1], :offset 326},
    :arp-3/step {:cc [60 34], :in [0 1], :offset 326},
    :arp-4/step {:cc [60 35], :in [0 1], :offset 326},
@@ -572,126 +568,126 @@
    :arp-7/step {:cc [60 38], :in [0 1], :offset 326},
    :arp-8/step {:cc [60 39], :in [0 1], :offset 326},
 
-   :mod-matrix-1/source-1 {:cc [1 83] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-1/source-2 {:cc [1 84] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-1/anim-trigger {:cc [1 85] :in [0 8] :enum anim-trigger-enum}
-   :mod-matrix-1/depth {:cc [1 86] :in [0 127] :out [-64 63]}
-   :mod-matrix-1/destination {:cc [1 87] :in [0 69]} ;; TODO: Enum
+   :mod-matrix-1/source-1 {:cc [1 83] :in [0 18] :enum mod-matrix-source-enum :offset 339}
+   :mod-matrix-1/source-2 {:cc [1 84] :in [0 18] :enum mod-matrix-source-enum :offset 340}
+   :mod-matrix-1/anim-trigger {:cc [1 85] :in [0 8] :enum anim-trigger-enum :offset 341}
+   :mod-matrix-1/depth {:cc [1 86] :in [0 127] :out [-64 63] :offset 342}
+   :mod-matrix-1/destination {:cc [1 87] :in [0 69] :offset 343} ;; TODO: Enum
 
-   :mod-matrix-2/source-1 {:cc [1 88] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-2/source-2 {:cc [1 89] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-2/anim-trigger {:cc [1 90] :in [0 8] :enum anim-trigger-enum}
-   :mod-matrix-2/depth {:cc [1 91] :in [0 127] :out [-64 63]}
-   :mod-matrix-2/destination {:cc [1 92] :in [0 69]} ;; TODO: Enum
+   :mod-matrix-2/source-1 {:cc [1 88] :in [0 18] :enum mod-matrix-source-enum :offset 344}
+   :mod-matrix-2/source-2 {:cc [1 89] :in [0 18] :enum mod-matrix-source-enum :offset 345}
+   :mod-matrix-2/anim-trigger {:cc [1 90] :in [0 8] :enum anim-trigger-enum :offset 346}
+   :mod-matrix-2/depth {:cc [1 91] :in [0 127] :out [-64 63] :offset 347}
+   :mod-matrix-2/destination {:cc [1 92] :in [0 69] :offset 348} ;; TODO: Enum
 
-   :mod-matrix-3/source-1 {:cc [1 93] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-3/source-2 {:cc [1 94] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-3/anim-trigger {:cc [1 95] :in [0 8] :enum anim-trigger-enum}
+   :mod-matrix-3/source-1 {:cc [1 93] :in [0 18] :enum mod-matrix-source-enum :offset 349}
+   :mod-matrix-3/source-2 {:cc [1 94] :in [0 18] :enum mod-matrix-source-enum :offset 350}
+   :mod-matrix-3/anim-trigger {:cc [1 95] :in [0 8] :enum anim-trigger-enum :offset 351}
    :mod-matrix-3/depth {:cc [1 96] :in [0 127] :out [-64 63] :offset 352}
    :mod-matrix-3/destination {:cc [1 97] :in [0 69] :offset 353} ;; TODO: Enum
 
-   :mod-matrix-4/source-1 {:cc [1 98] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-4/source-2 {:cc [1 99] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-4/anim-trigger {:cc [1 100] :in [0 8] :enum anim-trigger-enum}
-   :mod-matrix-4/depth {:cc [1 101] :in [0 127] :out [-64 63]}
-   :mod-matrix-4/destination {:cc [1 102] :in [0 69]} ;; TODO: Enum
+   :mod-matrix-4/source-1 {:cc [1 98] :in [0 18] :enum mod-matrix-source-enum :offset 354}
+   :mod-matrix-4/source-2 {:cc [1 99] :in [0 18] :enum mod-matrix-source-enum :offset 355}
+   :mod-matrix-4/anim-trigger {:cc [1 100] :in [0 8] :enum anim-trigger-enum :offset 356}
+   :mod-matrix-4/depth {:cc [1 101] :in [0 127] :out [-64 63] :offset 357}
+   :mod-matrix-4/destination {:cc [1 102] :in [0 69] :offset 358} ;; TODO: Enum
 
-   :mod-matrix-5/source-1 {:cc [1 103] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-5/source-2 {:cc [1 104] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-5/anim-trigger {:cc [1 105] :in [0 8] :enum anim-trigger-enum}
-   :mod-matrix-5/depth {:cc [1 106] :in [0 127] :out [-64 63]}
-   :mod-matrix-5/destination {:cc [1 107] :in [0 69]} ;; TODO: Enum
+   :mod-matrix-5/source-1 {:cc [1 103] :in [0 18] :enum mod-matrix-source-enum :offset 359}
+   :mod-matrix-5/source-2 {:cc [1 104] :in [0 18] :enum mod-matrix-source-enum :offset 360}
+   :mod-matrix-5/anim-trigger {:cc [1 105] :in [0 8] :enum anim-trigger-enum :offset 361}
+   :mod-matrix-5/depth {:cc [1 106] :in [0 127] :out [-64 63] :offset 362}
+   :mod-matrix-5/destination {:cc [1 107] :in [0 69] :offset 363} ;; TODO: Enum
 
-   :mod-matrix-6/source-1 {:cc [1 108] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-6/source-2 {:cc [1 109] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-6/anim-trigger {:cc [1 110] :in [0 8] :enum anim-trigger-enum}
-   :mod-matrix-6/depth {:cc [1 111] :in [0 127] :out [-64 63]}
-   :mod-matrix-6/destination {:cc [1 112] :in [0 69]} ;; TODO: Enum
+   :mod-matrix-6/source-1 {:cc [1 108] :in [0 18] :enum mod-matrix-source-enum :offset 364}
+   :mod-matrix-6/source-2 {:cc [1 109] :in [0 18] :enum mod-matrix-source-enum :offset 365}
+   :mod-matrix-6/anim-trigger {:cc [1 110] :in [0 8] :enum anim-trigger-enum :offset 366}
+   :mod-matrix-6/depth {:cc [1 111] :in [0 127] :out [-64 63] :offset 367}
+   :mod-matrix-6/destination {:cc [1 112] :in [0 69] :offset 368} ;; TODO: Enum
 
-   :mod-matrix-7/source-1 {:cc [1 113] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-7/source-2 {:cc [1 114] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-7/anim-trigger {:cc [1 115] :in [0 8] :enum anim-trigger-enum}
-   :mod-matrix-7/depth {:cc [1 116] :in [0 127] :out [-64 63]}
-   :mod-matrix-7/destination {:cc [1 117] :in [0 69]} ;; TODO: Enum
+   :mod-matrix-7/source-1 {:cc [1 113] :in [0 18] :enum mod-matrix-source-enum :offset 369}
+   :mod-matrix-7/source-2 {:cc [1 114] :in [0 18] :enum mod-matrix-source-enum :offset 370}
+   :mod-matrix-7/anim-trigger {:cc [1 115] :in [0 8] :enum anim-trigger-enum :offset 371}
+   :mod-matrix-7/depth {:cc [1 116] :in [0 127] :out [-64 63] :offset 372}
+   :mod-matrix-7/destination {:cc [1 117] :in [0 69] :offset 373} ;; TODO: Enum
 
-   :mod-matrix-8/source-1 {:cc [1 118] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-8/source-2 {:cc [1 119] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-8/anim-trigger {:cc [1 120] :in [0 8] :enum anim-trigger-enum}
-   :mod-matrix-8/depth {:cc [1 121] :in [0 127] :out [-64 63]}
-   :mod-matrix-8/destination {:cc [1 122] :in [0 69]} ;; TODO: Enum
+   :mod-matrix-8/source-1 {:cc [1 118] :in [0 18] :enum mod-matrix-source-enum :offset 374}
+   :mod-matrix-8/source-2 {:cc [1 119] :in [0 18] :enum mod-matrix-source-enum :offset 375}
+   :mod-matrix-8/anim-trigger {:cc [1 120] :in [0 8] :enum anim-trigger-enum :offset 376}
+   :mod-matrix-8/depth {:cc [1 121] :in [0 127] :out [-64 63] :offset 377}
+   :mod-matrix-8/destination {:cc [1 122] :in [0 69] :offset 378} ;; TODO: Enum
 
    ;; FIXME: Does this really collide with lfo-n/fade-mode?!
-   :mod-matrix-9/source-1 {:cc [1 123] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-9/source-2 {:cc [1 124] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-9/anim-trigger {:cc [1 125] :in [0 8] :enum anim-trigger-enum}
-   :mod-matrix-9/depth {:cc [1 126] :in [0 127] :out [-64 63]}
-   :mod-matrix-9/destination {:cc [1 127] :in [0 69]} ;; TODO: Enum
+   :mod-matrix-9/source-1 {:cc [1 123] :in [0 18] :enum mod-matrix-source-enum :offset 379}
+   :mod-matrix-9/source-2 {:cc [1 124] :in [0 18] :enum mod-matrix-source-enum :offset 380}
+   :mod-matrix-9/anim-trigger {:cc [1 125] :in [0 8] :enum anim-trigger-enum :offset 381}
+   :mod-matrix-9/depth {:cc [1 126] :in [0 127] :out [-64 63] :offset 382}
+   :mod-matrix-9/destination {:cc [1 127] :in [0 69] :offset 383} ;; TODO: Enum
 
    :mod-matrix-10/source-1 {:cc [2 0] :in [0 18] :enum mod-matrix-source-enum :offset 384}
    :mod-matrix-10/source-2 {:cc [2 1] :in [0 18] :enum mod-matrix-source-enum :offset 385}
-   :mod-matrix-10/anim-trigger {:cc [2 2] :in [0 8] :enum anim-trigger-enum}
-   :mod-matrix-10/depth {:cc [2 3] :in [0 127] :out [-64 63]}
-   :mod-matrix-10/destination {:cc [2 4] :in [0 69]} ;; TODO: Enum
+   :mod-matrix-10/anim-trigger {:cc [2 2] :in [0 8] :enum anim-trigger-enum :offset 386}
+   :mod-matrix-10/depth {:cc [2 3] :in [0 127] :out [-64 63] :offset 387}
+   :mod-matrix-10/destination {:cc [2 4] :in [0 69] :offset 388} ;; TODO: Enum
 
-   :mod-matrix-11/source-1 {:cc [2 5] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-11/source-2 {:cc [2 6] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-11/anim-trigger {:cc [2 7] :in [0 8] :enum anim-trigger-enum}
-   :mod-matrix-11/depth {:cc [2 8] :in [0 127] :out [-64 63]}
-   :mod-matrix-11/destination {:cc [2 9] :in [0 69]} ;; TODO: Enum
+   :mod-matrix-11/source-1 {:cc [2 5] :in [0 18] :enum mod-matrix-source-enum :offset 389}
+   :mod-matrix-11/source-2 {:cc [2 6] :in [0 18] :enum mod-matrix-source-enum :offset 390}
+   :mod-matrix-11/anim-trigger {:cc [2 7] :in [0 8] :enum anim-trigger-enum :offset 391}
+   :mod-matrix-11/depth {:cc [2 8] :in [0 127] :out [-64 63] :offset 392}
+   :mod-matrix-11/destination {:cc [2 9] :in [0 69] :offset 393} ;; TODO: Enum
 
-   :mod-matrix-12/source-1 {:cc [2 10] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-12/source-2 {:cc [2 11] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-12/anim-trigger {:cc [2 12] :in [0 8] :enum anim-trigger-enum}
-   :mod-matrix-12/depth {:cc [2 13] :in [0 127] :out [-64 63]}
-   :mod-matrix-12/destination {:cc [2 14] :in [0 69]} ;; TODO: Enum
+   :mod-matrix-12/source-1 {:cc [2 10] :in [0 18] :enum mod-matrix-source-enum :offset 394}
+   :mod-matrix-12/source-2 {:cc [2 11] :in [0 18] :enum mod-matrix-source-enum :offset 395}
+   :mod-matrix-12/anim-trigger {:cc [2 12] :in [0 8] :enum anim-trigger-enum :offset 396}
+   :mod-matrix-12/depth {:cc [2 13] :in [0 127] :out [-64 63] :offset 397}
+   :mod-matrix-12/destination {:cc [2 14] :in [0 69] :offset 398} ;; TODO: Enum
 
-   :mod-matrix-13/source-1 {:cc [2 15] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-13/source-2 {:cc [2 16] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-13/anim-trigger {:cc [2 17] :in [0 8] :enum anim-trigger-enum}
-   :mod-matrix-13/depth {:cc [2 18] :in [0 127] :out [-64 63]}
-   :mod-matrix-13/destination {:cc [2 19] :in [0 69]} ;; TODO: Enum
+   :mod-matrix-13/source-1 {:cc [2 15] :in [0 18] :enum mod-matrix-source-enum :offset 399}
+   :mod-matrix-13/source-2 {:cc [2 16] :in [0 18] :enum mod-matrix-source-enum :offset 400}
+   :mod-matrix-13/anim-trigger {:cc [2 17] :in [0 8] :enum anim-trigger-enum :offset 401}
+   :mod-matrix-13/depth {:cc [2 18] :in [0 127] :out [-64 63] :offset 402}
+   :mod-matrix-13/destination {:cc [2 19] :in [0 69] :offset 403} ;; TODO: Enum
 
-   :mod-matrix-14/source-1 {:cc [2 20] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-14/source-2 {:cc [2 21] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-14/anim-trigger {:cc [2 22] :in [0 8] :enum anim-trigger-enum}
-   :mod-matrix-14/depth {:cc [2 23] :in [0 127] :out [-64 63]}
-   :mod-matrix-14/destination {:cc [2 24] :in [0 69]} ;; TODO: Enum
+   :mod-matrix-14/source-1 {:cc [2 20] :in [0 18] :enum mod-matrix-source-enum :offset 404}
+   :mod-matrix-14/source-2 {:cc [2 21] :in [0 18] :enum mod-matrix-source-enum :offset 405}
+   :mod-matrix-14/anim-trigger {:cc [2 22] :in [0 8] :enum anim-trigger-enum :offset 406}
+   :mod-matrix-14/depth {:cc [2 23] :in [0 127] :out [-64 63] :offset 407}
+   :mod-matrix-14/destination {:cc [2 24] :in [0 69] :offset 408} ;; TODO: Enum
 
-   :mod-matrix-15/source-1 {:cc [2 25] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-15/source-2 {:cc [2 26] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-15/anim-trigger {:cc [2 27] :in [0 8] :enum anim-trigger-enum}
-   :mod-matrix-15/depth {:cc [2 28] :in [0 127] :out [-64 63]}
-   :mod-matrix-15/destination {:cc [2 29] :in [0 69]} ;; TODO: Enum
+   :mod-matrix-15/source-1 {:cc [2 25] :in [0 18] :enum mod-matrix-source-enum :offset 409}
+   :mod-matrix-15/source-2 {:cc [2 26] :in [0 18] :enum mod-matrix-source-enum :offset 410}
+   :mod-matrix-15/anim-trigger {:cc [2 27] :in [0 8] :enum anim-trigger-enum :offset 411}
+   :mod-matrix-15/depth {:cc [2 28] :in [0 127] :out [-64 63] :offset 412}
+   :mod-matrix-15/destination {:cc [2 29] :in [0 69] :offset 413} ;; TODO: Enum
 
-   :mod-matrix-16/source-1 {:cc [2 30] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-16/source-2 {:cc [2 31] :in [0 18] :enum mod-matrix-source-enum}
+   :mod-matrix-16/source-1 {:cc [2 30] :in [0 18] :enum mod-matrix-source-enum :offset 414}
+   :mod-matrix-16/source-2 {:cc [2 31] :in [0 18] :enum mod-matrix-source-enum :offset 415}
    :mod-matrix-16/anim-trigger {:cc [2 32] :in [0 8] :enum anim-trigger-enum :offset 416}
    :mod-matrix-16/depth {:cc [2 33] :in [0 127] :out [-64 63] :offset 417}
-   :mod-matrix-16/destination {:cc [2 34] :in [0 69]} ;; TODO: Enum
+   :mod-matrix-16/destination {:cc [2 34] :in [0 69] :offset 418} ;; TODO: Enum
 
-   :mod-matrix-17/source-1 {:cc [2 35] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-17/source-2 {:cc [2 36] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-17/anim-trigger {:cc [2 37] :in [0 8] :enum anim-trigger-enum}
-   :mod-matrix-17/depth {:cc [2 38] :in [0 127] :out [-64 63]}
-   :mod-matrix-17/destination {:cc [2 39] :in [0 69]} ;; TODO: Enum
+   :mod-matrix-17/source-1 {:cc [2 35] :in [0 18] :enum mod-matrix-source-enum :offset 419}
+   :mod-matrix-17/source-2 {:cc [2 36] :in [0 18] :enum mod-matrix-source-enum :offset 420}
+   :mod-matrix-17/anim-trigger {:cc [2 37] :in [0 8] :enum anim-trigger-enum :offset 421}
+   :mod-matrix-17/depth {:cc [2 38] :in [0 127] :out [-64 63] :offset 422}
+   :mod-matrix-17/destination {:cc [2 39] :in [0 69] :offset 423} ;; TODO: Enum
 
-   :mod-matrix-18/source-1 {:cc [2 40] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-18/source-2 {:cc [2 41] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-18/anim-trigger {:cc [2 42] :in [0 8] :enum anim-trigger-enum}
-   :mod-matrix-18/depth {:cc [2 43] :in [0 127] :out [-64 63]}
-   :mod-matrix-18/destination {:cc [2 44] :in [0 69]} ;; TODO: Enum
+   :mod-matrix-18/source-1 {:cc [2 40] :in [0 18] :enum mod-matrix-source-enum :offset 424}
+   :mod-matrix-18/source-2 {:cc [2 41] :in [0 18] :enum mod-matrix-source-enum :offset 425}
+   :mod-matrix-18/anim-trigger {:cc [2 42] :in [0 8] :enum anim-trigger-enum :offset 426}
+   :mod-matrix-18/depth {:cc [2 43] :in [0 127] :out [-64 63] :offset 427}
+   :mod-matrix-18/destination {:cc [2 44] :in [0 69] :offset 428} ;; TODO: Enum
 
-   :mod-matrix-19/source-1 {:cc [2 45] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-19/source-2 {:cc [2 46] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-19/anim-trigger {:cc [2 47] :in [0 8] :enum anim-trigger-enum}
-   :mod-matrix-19/depth {:cc [2 48] :in [0 127] :out [-64 63]}
-   :mod-matrix-19/destination {:cc [2 49] :in [0 69]} ;; TODO: Enum
+   :mod-matrix-19/source-1 {:cc [2 45] :in [0 18] :enum mod-matrix-source-enum :offset 429}
+   :mod-matrix-19/source-2 {:cc [2 46] :in [0 18] :enum mod-matrix-source-enum :offset 430}
+   :mod-matrix-19/anim-trigger {:cc [2 47] :in [0 8] :enum anim-trigger-enum :offset 431}
+   :mod-matrix-19/depth {:cc [2 48] :in [0 127] :out [-64 63] :offset 432}
+   :mod-matrix-19/destination {:cc [2 49] :in [0 69] :offset 433} ;; TODO: Enum
 
-   :mod-matrix-20/source-1 {:cc [2 50] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-20/source-2 {:cc [2 51] :in [0 18] :enum mod-matrix-source-enum}
-   :mod-matrix-20/anim-trigger {:cc [2 52] :in [0 8] :enum anim-trigger-enum}
-   :mod-matrix-20/depth {:cc [2 53] :in [0 127] :out [-64 63]}
-   :mod-matrix-20/destination {:cc [2 54] :in [0 69]} ;; TODO: Enum
+   :mod-matrix-20/source-1 {:cc [2 50] :in [0 18] :enum mod-matrix-source-enum :offset 434}
+   :mod-matrix-20/source-2 {:cc [2 51] :in [0 18] :enum mod-matrix-source-enum :offset 435}
+   :mod-matrix-20/anim-trigger {:cc [2 52] :in [0 8] :enum anim-trigger-enum :offset 436}
+   :mod-matrix-20/depth {:cc [2 53] :in [0 127] :out [-64 63] :offset 437}
+   :mod-matrix-20/destination {:cc [2 54] :in [0 69] :offset 438} ;; TODO: Enum
 
    :tweaks/assignment-1 {:cc [4 0] :in [0 125] :offset 0} ;; TODO: Enum
    :tweaks/assignment-2 {:cc [4 1] :in [0 125] :offset 0} ;; TODO: Enum
