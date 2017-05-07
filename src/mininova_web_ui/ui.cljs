@@ -1,8 +1,10 @@
 (ns mininova-web-ui.ui
-  (:require [reagent.core :as reagent]
+  (:require [reagent.core :as r]
             [re-frame.core :as rf]
             [mininova-web-ui.midi :as midi]
             [mininova-web-ui.params :as params]))
+
+(def patch-inspector-enabled? true)
 
 (def patch-request-message
   [0xF0 0x00 0x20 0x29 0x03 0x01 0x7F 0x40 0x00 0x00 0x00 0x00 0x00 0xF7])
@@ -10,7 +12,7 @@
 (def patch-response-sentinel
   [0xF0 0x00 0x20 0x29 0x03 0x01 0x7F 0x00 0x00 0x09 0x04])
 
-(def default-panel :osc)
+(def default-panel (keyword (subs js/location.hash 1)))
 
 ;; FIXME: Get ridi of `re-frame: no :fx handler registered for :event` error
 (rf/reg-fx :event (fn [_ _]))
@@ -91,34 +93,40 @@
 
 (defn make-set-patch-value [data]
   (fn [db [id param]]
-    (if (contains? param :offset)
+    (if (and (contains? param :offset) (not= 0 (:offset param)))
       (assoc-in db [::control id] (nth data (:offset param)))
       db)))
+
+(defn apply-patch [db data]
+  (reduce (make-set-patch-value data) db params/params))
 
 (rf/reg-event-db ::midi/sysex
   [rf/debug]
   (fn [db [_ data]]
     (if (patch-dump? data)
-      (reduce (make-set-patch-value data) db params/params))))
+      (-> db
+          (apply-patch data)
+          (assoc ::patch data)))))
+
+(rf/reg-sub ::patch
+  (fn [db]
+    (::patch db)))
+
+(defn tab [{:keys [id]}]
+  (let [current-tab @(rf/subscribe [::panel])]
+    [:a {:class (if (or (= current-tab id)) (nil? current-tab) "is-active")
+         :href (str "#" (name id))
+         :on-click #(rf/dispatch [::panel id])}
+      (first (r/children (r/current-component)))]))
 
 (defn tabs []
-  (let [tab @(rf/subscribe [::panel])]
-    [:ul.tabs
-      [:li {:class (if (or (= tab :osc)) (nil? tab) "is-active")
-            :on-click #(rf/dispatch [::panel :osc])}
-        "Osc"]
-      [:li {:class (if (= tab :filter) "is-active")
-            :on-click #(rf/dispatch [::panel :filter])}
-        "Filter"]
-      [:li {:class (if (= tab :env) "is-active")
-            :on-click #(rf/dispatch [::panel :env])}
-        "Env"]
-      [:li {:class (if (= tab :lfo) "is-active")
-            :on-click #(rf/dispatch [::panel :lfo])}
-        "LFO"]
-      [:li {:class (if (= tab :arp) "is-active")
-            :on-click #(rf/dispatch [::panel :arp])}
-        "ARP"]]))
+  [:ul.tabs
+    [:li [tab {:id :filter} "Filter"]]
+    [:li [tab {:id :env} "Env"]]
+    [:li [tab {:id :lfo} "LFO"]]
+    [:li [tab {:id :arp} "ARP"]]
+    (if patch-inspector-enabled?
+      [:li [tab {:id :patch-inspector} "Patch inspector"]])])
 
 (defn map-in-out [in out value]
   (+ (- value (first in)) (first out)))
@@ -279,6 +287,20 @@
       [:li [toggle {:id :arp-7/step :label "Step 7"}]]
       [:li [toggle {:id :arp-8/step :label "Step 8"}]]]])
 
+(defn patch-inspector-panel []
+  (let [patch @(rf/subscribe [::patch])]
+    [:div.patch-inspector-panel
+      [:h2 "Patch inspector"]
+      [:button {:on-click #(rf/dispatch [::midi/patch])} "Fetch patch"]
+      [:div {:style {:height "400px" :overflow-y "scroll"}}
+        [:table
+          [:thead
+            [:tr [:th "Offset"] [:th "Value"]]]
+          [:tbody
+            (for [[offset value] (map vector (range (count patch)) patch)]
+              ^{:key offset}
+              [:tr [:td offset] [:td (str "0b" (.toString value 2))]])]]]]))
+
 (defn main-panel []
   (let [tab @(rf/subscribe [::panel])]
     [:main.main-panel
@@ -289,4 +311,5 @@
         :env [env-panel]
         :lfo [lfo-panel]
         :arp [arp-panel]
+        :patch-inspector [patch-inspector-panel]
         [:h2 "Select a panel"])]))
