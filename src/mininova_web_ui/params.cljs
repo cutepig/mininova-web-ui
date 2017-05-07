@@ -720,5 +720,3 @@
   (->> params
       (map #(assoc (second %) :id (first %)))
       (group-by :cc)))
-
-(println ::cc->param cc->param)

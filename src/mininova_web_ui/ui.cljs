@@ -12,6 +12,9 @@
 
 (def default-panel :osc)
 
+;; FIXME: Get ridi of `re-frame: no :fx handler registered for :event` error
+(rf/reg-fx :event (fn [_ _]))
+
 (rf/reg-event-db ::panel
   [rf/debug]
   (fn [db [_ panel]]
@@ -64,6 +67,13 @@
   (fn [db [_ id]]
     (get-in db [::control id])))
 
+(rf/reg-event-fx ::midi/connect
+  [rf/debug]
+  (fn [fx [_ connected?]]
+    (-> fx
+        (assoc-in [:db ::connected?] connected?)
+        (assoc ::midi/midi (if connected? [patch-request-message])))))
+
 (rf/reg-event-fx ::midi/cc
   [rf/debug]
   (fn [fx [_ [_ cc value]]]
@@ -79,11 +89,17 @@
   (= patch-response-sentinel
      (take (count patch-response-sentinel) data)))
 
-(rf/reg-event-fx ::midi/sysex
+(defn make-set-patch-value [data]
+  (fn [db [id param]]
+    (if (contains? param :offset)
+      (assoc-in db [::control id] (nth data (:offset param)))
+      db)))
+
+(rf/reg-event-db ::midi/sysex
   [rf/debug]
-  (fn [fx [_ data]]
+  (fn [db [_ data]]
     (if (patch-dump? data)
-      (println "Received patch dump!"))))
+      (reduce (make-set-patch-value data) db params/params))))
 
 (defn tabs []
   (let [tab @(rf/subscribe [::panel])]

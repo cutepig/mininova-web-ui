@@ -48,6 +48,7 @@
 (defn connect-input! [input port]
   (println "MiniNova input is now connected")
   (set! (.-onmidimessage port) #(on-midi-message (Array->clj (.-data %))))
+  (rf/dispatch [::connect true])
   (reset! input port))
 
 (defn disconnect-input! [input]
@@ -72,6 +73,7 @@
                      (filter #(= "MiniNova" (.-name %)))
                      first)]
     (println "on-state-change" [input-atom output-atom] [input-port output-port])
+    ;; FIXME: `connect-input` is called twice
     (if (and (some? input-port) (nil? @input-atom))
       (connect-input! input-atom input-port))
     (if (and (nil? input-port) (some? @input-atom))
