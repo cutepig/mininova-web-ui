@@ -1,10 +1,21 @@
 (ns mininova-web-ui.ui
-  (:require [reagent.core :as reagent]
+  (:require [reagent.core :as r]
             [re-frame.core :as rf]
             [mininova-web-ui.midi :as midi]
             [mininova-web-ui.params :as params]))
 
-(def default-panel :osc)
+(def patch-inspector-enabled? true)
+
+(def patch-request-message
+  [0xF0 0x00 0x20 0x29 0x03 0x01 0x7F 0x40 0x00 0x00 0x00 0x00 0x00 0xF7])
+
+(def patch-response-sentinel
+  [0xF0 0x00 0x20 0x29 0x03 0x01 0x7F 0x00 0x00 0x09 0x04])
+
+(def default-panel (keyword (subs js/location.hash 1)))
+
+;; FIXME: Get ridi of `re-frame: no :fx handler registered for :event` error
+(rf/reg-fx :event (fn [_ _]))
 
 (rf/reg-event-db ::panel
   [rf/debug]
@@ -15,7 +26,7 @@
   (fn [db _]
     (get db ::panel default-panel)))
 
-(defn send-midi [fx cc value from-midi?]
+(defn send-midi-control [fx cc value from-midi?]
   (if from-midi?
     fx
     ;; If the event doesn't originate from midi, send it
@@ -28,6 +39,9 @@
         ;; Regular CC
         [[0xB0 cc value]]))))
 
+;; Multi control is a CC/NRPN binding that has multiple controls
+;; separated by value ranges, for example :env-[1-6]/trigger controls
+;; are all bound to NRPN (0 122). This matches the control by value.
 (defn set-multi-control [fx cc value params]
   (let [id (->> params
                 (filter #(<= (first (:in %)) value (second (:in %))))
@@ -38,41 +52,81 @@
       fx)))
 
 
-(defn set-control [fx id cc value]
+(defn set-control [fx cc value]
   (let [params (get params/cc->param cc)]
     (if (= 1 (count params))
-      (assoc-in fx [:db ::control id] value)
+      (assoc-in fx [:db ::control (:id (first params))] value)
       (set-multi-control fx cc value params))))
 
 (rf/reg-event-fx ::control
   [rf/debug]
-  (fn [fx [_ id cc value from-midi?]]
+  (fn [fx [_ cc value from-midi?]]
     (-> fx
-        (set-control id cc value)
-        (send-midi cc value from-midi?))))
+        (set-control cc value)
+        (send-midi-control cc value from-midi?))))
 
 (rf/reg-sub ::control
   (fn [db [_ id]]
     (get-in db [::control id])))
 
+(rf/reg-event-fx ::midi/connect
+  [rf/debug]
+  (fn [fx [_ connected?]]
+    (-> fx
+        (assoc-in [:db ::connected?] connected?)
+        (assoc ::midi/midi (if connected? [patch-request-message])))))
+
+(rf/reg-event-fx ::midi/cc
+  [rf/debug]
+  (fn [fx [_ [_ cc value]]]
+    (-> fx
+        (assoc :dispatch [::control cc value true]))))
+
+(rf/reg-event-fx ::midi/patch
+  [rf/debug]
+  (fn [fx _]
+    (assoc fx ::midi/midi [patch-request-message])))
+
+(defn patch-dump? [data]
+  (= patch-response-sentinel
+     (take (count patch-response-sentinel) data)))
+
+(defn make-set-patch-value [data]
+  (fn [db [id param]]
+    (if (and (contains? param :offset) (not= 0 (:offset param)))
+      (assoc-in db [::control id] (nth data (:offset param)))
+      db)))
+
+(defn apply-patch [db data]
+  (reduce (make-set-patch-value data) db params/params))
+
+(rf/reg-event-db ::midi/sysex
+  [rf/debug]
+  (fn [db [_ data]]
+    (if (patch-dump? data)
+      (-> db
+          (apply-patch data)
+          (assoc ::patch data)))))
+
+(rf/reg-sub ::patch
+  (fn [db]
+    (::patch db)))
+
+(defn tab [{:keys [id]}]
+  (let [current-tab @(rf/subscribe [::panel])]
+    [:a {:class (if (or (= current-tab id)) (nil? current-tab) "is-active")
+         :href (str "#" (name id))
+         :on-click #(rf/dispatch [::panel id])}
+      (first (r/children (r/current-component)))]))
+
 (defn tabs []
-  (let [tab @(rf/subscribe [::panel])]
-    [:ul.tabs
-      [:li {:class (if (or (= tab :osc)) (nil? tab) "is-active")
-            :on-click #(rf/dispatch [::panel :osc])}
-        "Osc"]
-      [:li {:class (if (= tab :filter) "is-active")
-            :on-click #(rf/dispatch [::panel :filter])}
-        "Filter"]
-      [:li {:class (if (= tab :env) "is-active")
-            :on-click #(rf/dispatch [::panel :env])}
-        "Env"]
-      [:li {:class (if (= tab :lfo) "is-active")
-            :on-click #(rf/dispatch [::panel :lfo])}
-        "LFO"]
-      [:li {:class (if (= tab :arp) "is-active")
-            :on-click #(rf/dispatch [::panel :arp])}
-        "ARP"]]))
+  [:ul.tabs
+    [:li [tab {:id :filter} "Filter"]]
+    [:li [tab {:id :env} "Env"]]
+    [:li [tab {:id :lfo} "LFO"]]
+    [:li [tab {:id :arp} "ARP"]]
+    (if patch-inspector-enabled?
+      [:li [tab {:id :patch-inspector} "Patch inspector"]])])
 
 (defn map-in-out [in out value]
   (+ (- value (first in)) (first out)))
@@ -87,7 +141,7 @@
                  :value value
                  :min (first (:in param))
                  :max (second (:in param))
-                 :on-change #(rf/dispatch [::control id (:cc param) (.-currentTarget.value %)])}]
+                 :on-change #(rf/dispatch [::control (:cc param) (.-currentTarget.value %)])}]
         [:span (map-in-out (:in param) (:out param) value)]]]))
 
 (defn select-enum [{:keys [id label]}]
@@ -97,7 +151,7 @@
       [:label label
         [:select {:id (str id)
                   :value (or value "")
-                  :on-change #(rf/dispatch [::control id (:cc param) (.-currentTarget.value %)])}
+                  :on-change #(rf/dispatch [::control (:cc param) (.-currentTarget.value %)])}
          [:option {:value "" :disabled true} label]
          (for [[val lbl] (map vector (range (first (:in param)) (inc (second (:in param)))) (:enum param))]
            ^{:key val}
@@ -110,9 +164,9 @@
       [:label label
         [:input {:type :checkbox
                  :checked (= value (second (:in param)))
-                 :on-change #(rf/dispatch [::control id (:cc param) (if (.-currentTarget.checked %)
-                                                                      (second (:in param))
-                                                                      (first (:in param)))])}]]]))
+                 :on-change #(rf/dispatch [::control (:cc param) (if (.-currentTarget.checked %)
+                                                                     (second (:in param))
+                                                                     (first (:in param)))])}]]]))
 
 (defn osc-strip [index]
   (let [key #(keyword (str "osc-" index "/" %))]
@@ -233,6 +287,20 @@
       [:li [toggle {:id :arp-7/step :label "Step 7"}]]
       [:li [toggle {:id :arp-8/step :label "Step 8"}]]]])
 
+(defn patch-inspector-panel []
+  (let [patch @(rf/subscribe [::patch])]
+    [:div.patch-inspector-panel
+      [:h2 "Patch inspector"]
+      [:button {:on-click #(rf/dispatch [::midi/patch])} "Fetch patch"]
+      [:div {:style {:height "400px" :overflow-y "scroll"}}
+        [:table
+          [:thead
+            [:tr [:th "Offset"] [:th "Value"]]]
+          [:tbody
+            (for [[offset value] (map vector (range (count patch)) patch)]
+              ^{:key offset}
+              [:tr [:td offset] [:td (str "0b" (.toString value 2))]])]]]]))
+
 (defn main-panel []
   (let [tab @(rf/subscribe [::panel])]
     [:main.main-panel
@@ -243,4 +311,5 @@
         :env [env-panel]
         :lfo [lfo-panel]
         :arp [arp-panel]
+        :patch-inspector [patch-inspector-panel]
         [:h2 "Select a panel"])]))

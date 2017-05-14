@@ -14,9 +14,41 @@
     (.forEach a #(.push v %))
     (js->clj v)))
 
+(defn on-nrpn [nrpn-v]
+  (let [msb (nth (first @nrpn-v) 2)
+        lsb (nth (second @nrpn-v) 2)
+        value (nth (nth @nrpn-v 2) 2)]
+    (rf/dispatch [::cc [0xb0 [msb lsb] value]])
+    (reset! nrpn-v [])))
+
+(defn on-cc [nrpn-v data]
+  ;; Check if we are in the middle of NRPN message
+  (if (< 0 (count @nrpn-v))
+    (do
+      (swap! nrpn-v conj data)
+      ;; TODO: Handle 4 len vector
+      (if (= 3 (count @nrpn-v))
+        (on-nrpn nrpn-v)))
+    ;; Check first NRPN message
+    (if (= 0x63 (second data))
+      (swap! nrpn-v conj data)
+      (rf/dispatch [::cc data]))))
+
+(def nrpn-v (atom []))
+
+(defn on-midi-message [data]
+  (println ::on-midi-message data)
+  (let [status (first data)]
+    (condp = status
+      0xb0 (on-cc nrpn-v data)
+      0xc0 (rf/dispatch [::patch data])
+      0xf0 (rf/dispatch [::sysex data])
+      nil)))
+
 (defn connect-input! [input port]
   (println "MiniNova input is now connected")
-  (set! (.-onmidimessage port) #(println (Array->clj (.-data %))))
+  (set! (.-onmidimessage port) #(on-midi-message (Array->clj (.-data %))))
+  (rf/dispatch [::connect true])
   (reset! input port))
 
 (defn disconnect-input! [input]
@@ -31,8 +63,6 @@
   (println "MiniNova output is now disconnected")
   (reset! output nil))
 
-; ..
-
 (defn configure-ports [input-atom output-atom midi-access]
   (let [input-port (->> (Map->clj (.-inputs midi-access))
                     vals
@@ -43,6 +73,7 @@
                      (filter #(= "MiniNova" (.-name %)))
                      first)]
     (println "on-state-change" [input-atom output-atom] [input-port output-port])
+    ;; FIXME: `connect-input` is called twice
     (if (and (some? input-port) (nil? @input-atom))
       (connect-input! input-atom input-port))
     (if (and (nil? input-port) (some? @input-atom))
@@ -61,7 +92,7 @@
                          (reset! midi-access ma)
                          (set! (.-onstatechange ma) on-state-change)
                          (configure-ports input output ma))]
-    (-> (js/navigator.requestMIDIAccess #js {:sysex false})
+    (-> (js/navigator.requestMIDIAccess #js {:sysex true})
       (.then on-midi-access)
       (.catch #(println "MIDI access denied" %)))
 
