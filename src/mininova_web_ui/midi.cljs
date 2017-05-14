@@ -37,7 +37,7 @@
 (def nrpn-v (atom []))
 
 (defn on-midi-message [data]
-  (println ::on-midi-message data)
+  ; (println ::on-midi-message data)
   (let [status (first data)]
     (condp = status
       0xb0 (on-cc nrpn-v data)

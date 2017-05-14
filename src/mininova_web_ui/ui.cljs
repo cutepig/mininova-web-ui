@@ -91,10 +91,16 @@
   (= patch-response-sentinel
      (take (count patch-response-sentinel) data)))
 
+(defn decode-patch-value [value param]
+  (if (contains? param :decode)
+    (let [decoded-value (apply (:decode param) [value])]
+      (+ (first (:in param)) decoded-value))
+    value))
+
 (defn make-set-patch-value [data]
   (fn [db [id param]]
     (if (and (contains? param :offset) (not= 0 (:offset param)))
-      (assoc-in db [::control id] (nth data (:offset param)))
+      (assoc-in db [::control id] (decode-patch-value (nth data (:offset param)) param))
       db)))
 
 (defn apply-patch [db data]
@@ -125,11 +131,15 @@
     [:li [tab {:id :env} "Env"]]
     [:li [tab {:id :lfo} "LFO"]]
     [:li [tab {:id :arp} "ARP"]]
+    [:li [tab {:id :vocoder} "Vocoder"]]
+    [:li [tab {:id :vocal-tune} "Vocal tune"]]
     (if patch-inspector-enabled?
       [:li [tab {:id :patch-inspector} "Patch inspector"]])])
 
 (defn map-in-out [in out value]
-  (+ (- value (first in)) (first out)))
+  (if (some? out)
+    (+ (- value (first in)) (first out))
+    value))
 
 (defn knob [{:keys [id label]}]
   (let [param (get params/params id)
@@ -190,6 +200,14 @@
     [osc-strip 2]
     [osc-strip 3]])
 
+(defn filter-common-strip []
+  [:div.filter-common-strip
+    [:h2 "Filters"]
+    [select-enum {:id :filter/routing :label "Routing"}]
+    [knob {:id :filter/balance :label "Balance"}]
+    [select-enum {:id :filter/freq-link :label "FreqLink"}]
+    [select-enum {:id :filter/res-link :label "ResLink"}]])
+
 (defn filter-strip [index]
   (let [key #(keyword (str "filter-" index "/" %))]
     [:div.filter-strip
@@ -205,6 +223,7 @@
 
 (defn filter-panel []
   [:div.filter-panel
+    [filter-common-strip]
     [filter-strip 1]
     [filter-strip 2]])
 
@@ -287,6 +306,41 @@
       [:li [toggle {:id :arp-7/step :label "Step 7"}]]
       [:li [toggle {:id :arp-8/step :label "Step 8"}]]]])
 
+(defn vocoder-panel []
+  [:div.vocoder-panel
+    [:h2 "Vocoder"]
+    [toggle {:id :vocoder/on :label "On"}]
+    [select-enum {:id :vocoder/sibilance-type :label "SibilanceType"}]
+    [toggle {:id :vocoder/freeze :label "Freeze"}]
+    [toggle {:id :vocoder/all-max :label "AllMax"}]
+    [select-enum {:id :vocoder/vocoder-input :label "VocoderInput"}]
+    [knob {:id :vocoder/width :label "Width"}]
+    [knob {:id :vocoder/sibilance :label "Sibilance"}]
+    [knob {:id :vocoder/spec-shift :label "SpecShift"}]
+    [knob {:id :vocoder/spec-spread :label "SpecSpread"}]
+    [knob {:id :vocoder/level :label "Level"}]
+    [knob {:id :vocoder/carrier-level :label "CarrierLevel"}]
+    [knob {:id :vocoder/modulator-level :label "ModulatorLevel"}]
+    [knob {:id :vocoder/resonance :label "Resonance"}]
+    [knob {:id :vocoder/decay :label "Decay"}]
+    [knob {:id :vocoder/gate-treshold :label "GateTreshold"}]
+    [knob {:id :vocoder/gate-release :label "GateRelease"}]])
+
+(defn vocal-tune-panel []
+  [:div.vocal-tune-panel
+    [:h2 "Vocal tune"]
+    [knob {:id :vocal-tune/shift :label "Shift"}]
+    [knob {:id :vocal-tune/bend :label "Bend"}]
+    [select-enum {:id :vocal-tune/mode :label "Mode"}]
+    [select-enum {:id :vocal-tune/insert :label "Insert"}]
+    [select-enum {:id :vocal-tune/scale-type :label "ScaleType"}]
+    [select-enum {:id :vocal-tune/scale-key :label "ScaleKey"}]
+    [knob {:id :vocal-tune/correction-time :label "CorrectionTime"}]
+    [knob {:id :vocal-tune/level :label "Level"}]
+    [knob {:id :vocal-tune/vibrato :label "Vibrato"}]
+    [knob {:id :vocal-tune/vibrato-mod-wheel :label "VibratoModWheel"}]
+    [knob {:id :vocal-tune/vibrato-rate :label "VibratoRate"}]])
+
 (defn patch-inspector-panel []
   (let [patch @(rf/subscribe [::patch])]
     [:div.patch-inspector-panel
@@ -311,5 +365,7 @@
         :env [env-panel]
         :lfo [lfo-panel]
         :arp [arp-panel]
+        :vocoder [vocoder-panel]
+        :vocal-tune [vocal-tune-panel]
         :patch-inspector [patch-inspector-panel]
         [:h2 "Select a panel"])]))
