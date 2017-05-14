@@ -1,7 +1,9 @@
 (ns mininova-web-ui.params)
 
-(def waveforms (range 0 72))  ;; TODO: Proper enum of waveforms
-(def filter-types (range 0 14)) ;; TODO
+(defn byte-decoder [mask out]
+  (fn [x]))
+
+
 
 (def osc-waveform-enum
   [;; 0-10
@@ -85,7 +87,7 @@
    :midi/data-decrement {:cc 97 :in [0 127] :offset 0}
    :midi/nprn-lsb {:cc 98 :in [0 127] :offset 0}
    :midi/nprn-msb {:cc 99 :in [0 127] :offset 0}
-   ;; FIXME: Does this need an lsb and msb combo? DOES!
+   ;; FIXME: Handle CC's and NRPN's with lsb and msb values
    :midi/tempo {:cc [2 63] :in [40 140] :offset 0}
    :midi/all-sounds-off {:cc 120 :in [0] :offset 0}
    :midi/local-off-on {:cc 122 :in [33 99] :offset 0}
@@ -95,7 +97,6 @@
    :patch/patch-select {:cc [63 0] :in [0 2] :enum ["Decrement Patch" "Get Program Change" "Increment Patch"] :offset 0}
    :patch/bank-select {:cc [63 1] :in [1 3] :enum ["A" "B" "C"] :offset 0}
 
-   ;; TODO: Do we really need :out here?
    :osc/drift {:cc 16 :in [0 127] :offset 43}
    ;; TODO: 0-119: 0"-357", 120: "Free", ie. a map function
    :osc/phase {:cc 17 :in [0 120] :offset 44}
@@ -149,9 +150,8 @@
 
    :filter/routing {:cc 60 :in [0 5] :enum ["Bypass" "Single" "Series" "Parallel" "Parallal" "Drum"] :offset 86}
    :filter/balance {:cc 61 :in [0 127] :out [-64 63] :offset 87}
-   ;; FIXME: Figure out the patch encoding
-   :filter/freq-link {:cc [0 122] :in [42 43] :enum ["Off" "On"] :offset 88}
-   :filter/res-link {:cc [0 122] :in [44 45] :enum ["Off" "On"] :offset 88}
+   :filter/freq-link {:cc [0 122] :in [42 43] :enum ["Off" "On"] :decode #(bit-and % 1) :offset 88}
+   :filter/res-link {:cc [0 122] :in [44 45] :enum ["Off" "On"] :decode #(bit-and (bit-shift-right % 1) 1) :offset 88}
 
    :filter-1/drive {:cc 63 :in [0 127] :out [0 127] :offset 89}
    :filter-1/drive-type {:cc 65 :in [0 6] :enum filter-drive-type-enum :offset 90}
@@ -198,8 +198,7 @@
    :env-1/attack-slope {:cc 115 :in [0 127] :offset 126}
    :env-1/decay-slope {:cc 116 :in [0 127] :offset 127}
    :env-1/anim-trigger {:cc 117 :in [0 8] :enum env-anim-trigger-enum :offset 128}
-   ;; TODO: Figure out the encoding
-   :env-1/trigger {:cc [0 122] :in [0 1] :enum ["Single" "Multi"] :offset 112}
+   :env-1/trigger {:cc [0 122] :in [0 1] :enum ["Single" "Multi"] :decode #(bit-and % 1) :offset 112}
 
    :env-2/velocity {:cc [0 0] :in [0 127] :out [-64 63] :offset 129}
    :env-2/attack {:cc [0 1] :in [0 127] :offset 130}
@@ -215,7 +214,7 @@
    :env-2/attack-slope {:cc [0 11] :in [0 127] :offset 140}
    :env-2/decay-slope {:cc [0 12] :in [0 127] :offset 141}
    :env-2/anim-trigger {:cc [0 13] :in [0 24] :enum env-anim-trigger-enum :offset 142}
-   :env-2/trigger {:cc [0 122] :in [2 3] :enum ["Single" "Multi"] :offset 112}
+   :env-2/trigger {:cc [0 122] :in [2 3] :enum ["Single" "Multi"] :decode #(bit-and (bit-shift-right % 1) 1) :offset 112}
 
    :env-3/delay {:cc [0 14] :in [0 127] :offset 143}
    :env-3/attack {:cc [0 15] :in [0 127] :offset 144}
@@ -231,7 +230,7 @@
    :env-3/attack-slope {:cc [0 25] :in [0 127] :offset 154}
    :env-3/decay-slope {:cc [0 26] :in [0 127] :offset 155}
    :env-3/anim-trigger {:cc [0 27] :in [0 24] :enum env-anim-trigger-enum :offset 156}
-   :env-3/trigger {:cc [0 122] :in [4 5] :enum ["Single" "Multi"]  :offset 112}
+   :env-3/trigger {:cc [0 122] :in [4 5] :enum ["Single" "Multi"] :decode #(bit-and (bit-shift-right % 2) 1) :offset 112}
 
    :env-4/delay {:cc [0 28] :in [0 127] :offset 157}
    :env-4/attack {:cc [0 29] :in [0 127] :offset 158}
@@ -247,7 +246,7 @@
    :env-4/attack-slope {:cc [0 39] :in [0 127] :offset 168}
    :env-4/decay-slope {:cc [0 40] :in [0 127] :offset 169}
    :env-4/anim-trigger {:cc [0 41] :in [0 24] :enum env-anim-trigger-enum :offset 170}
-   :env-4/trigger {:cc [0 122] :in [6 7] :enum ["Single" "Multi"] :offset 112}
+   :env-4/trigger {:cc [0 122] :in [6 7] :enum ["Single" "Multi"] :decode #(bit-and (bit-shift-right % 3) 1) :offset 112}
 
    :env-5/delay {:cc [0 42] :in [0 127] :offset 171}
    :env-5/attack {:cc [0 43] :in [0 127] :offset 172}
@@ -263,7 +262,7 @@
    :env-5/attack-slope {:cc [0 53] :in [0 127] :offset 182}
    :env-5/decay-slope {:cc [0 54] :in [0 127] :offset 183}
    :env-5/anim-trigger {:cc [0 55] :in [0 24] :enum env-anim-trigger-enum :offset 184}
-   :env-5/trigger {:cc [0 122] :in [8 9] :enum ["Single" "Multi"] :offset 112}
+   :env-5/trigger {:cc [0 122] :in [8 9] :enum ["Single" "Multi"] :decode #(bit-and (bit-shift-right % 4) 1) :offset 112}
 
    :env-6/delay {:cc [0 56] :in [0 127] :offset 185}
    :env-6/attack {:cc [0 57] :in [0 127] :offset 186}
@@ -279,7 +278,7 @@
    :env-6/attack-slope {:cc [0 67] :in [0 127] :offset 196}
    :env-6/decay-slope {:cc [0 68] :in [0 127] :offset 197}
    :env-6/anim-trigger {:cc [0 69] :in [0 24] :enum env-anim-trigger-enum :offset 198}
-   :env-6/trigger {:cc [0 122] :in [10 11] :enum ["Single" "Multi"] :offset 112}
+   :env-6/trigger {:cc [0 122] :in [10 11] :enum ["Single" "Multi"] :decode #(bit-and (bit-shift-right % 5) 1) :offset 112}
 
    :lfo-1/waveform {:cc [0 70] :in [0 37] :enum lfo-waveform-enum :offset 199}
    :lfo-1/phase-offset {:cc [0 71] :in [0 119] :out [0 357] :offset 200}
@@ -288,13 +287,11 @@
    :lfo-1/delay-sync {:cc [0 75] :in [0 35] :enum sync-enum :offset 204}
    :lfo-1/rate {:cc [0 76] :in [0 127] :offset 205}
    :lfo-1/rate-sync {:cc [0 77] :in [0 35] :enum sync-enum :offset 206}
-   ;; TODO: Figure out the encoding
-   :lfo-1/one-shot {:cc [0 122] :in [12 13] :enum ["Normal" "OneShot"] :offset 207}
-   :lfo-1/key-sync {:cc [0 122] :in [14 15] :enum ["FreeRun" "KeySync"] :offset 207}
-   :lfo-1/common-sync {:cc [0 122] :in [16 17] :enum ["Normal" "Common"] :offset 207}
-   :lfo-1/delay-trigger {:cc [0 122] :in [18 19] :enum ["Single" "Multi"] :offset 207}
-   ;; TODO: Figure out the encoding
-   :lfo-1/fade-mode {:cc [1 123] :in [0 3] :enum ["Fade In" "Fade Out" "Gate In" "Gate Out"] :offset 379}
+   :lfo-1/one-shot {:cc [0 122] :in [12 13] :enum ["Normal" "OneShot"] :decode #(bit-and % 1) :offset 207}
+   :lfo-1/key-sync {:cc [0 122] :in [14 15] :enum ["FreeRun" "KeySync"] :decode #(bit-and (bit-shift-right % 1) 1) :offset 207}
+   :lfo-1/common-sync {:cc [0 122] :in [16 17] :enum ["Normal" "Common"] :decode #(bit-and (bit-shift-right % 2) 1) :offset 207}
+   :lfo-1/delay-trigger {:cc [0 122] :in [18 19] :enum ["Single" "Multi"] :decode #(bit-and (bit-shift-right % 3) 1) :offset 207}
+   :lfo-1/fade-mode {:cc [1 123] :in [0 3] :enum ["Fade In" "Fade Out" "Gate In" "Gate Out"] :decode #(bit-and (bit-shift-right % 4) 3) :offset 207}
 
    :lfo-2/waveform {:cc [0 79] :in [0 37] :enum lfo-waveform-enum :offset 208}
    :lfo-2/phase-offset {:cc [0 80] :in [0 119] :out [0 357] :offset 209}
@@ -303,11 +300,11 @@
    :lfo-2/delay-sync {:cc [0 84] :in [0 35] :enum sync-enum :offset 213}
    :lfo-2/rate {:cc [0 85] :in [0 127] :offset 214}
    :lfo-2/rate-sync {:cc [0 86] :in [0 35] :enum sync-enum :offset 215}
-   :lfo-2/one-shot {:cc [0 122] :in [22 23] :enum ["Normal" "OneShot"] :offset 216}
-   :lfo-2/key-sync {:cc [0 122] :in [24 25] :enum ["FreeRun" "KeySync"] :offset 216}
-   :lfo-2/common-sync {:cc [0 122] :in [26 27] :enum ["Normal" "Common"] :offset 216}
-   :lfo-2/delay-trigger {:cc [0 122] :in [28 29] :enum ["Single" "Multi"] :offset 216}
-   :lfo-2/fade-mode {:cc [1 123] :in [4 7] :enum ["Fade In" "Fade Out" "Gate In" "Gate Out"] :offset 379}
+   :lfo-2/one-shot {:cc [0 122] :in [22 23] :enum ["Normal" "OneShot"] :decode #(bit-and % 1) :offset 216}
+   :lfo-2/key-sync {:cc [0 122] :in [24 25] :enum ["FreeRun" "KeySync"] :decode #(bit-and (bit-shift-right % 1) 1) :offset 216}
+   :lfo-2/common-sync {:cc [0 122] :in [26 27] :enum ["Normal" "Common"] :decode #(bit-and (bit-shift-right % 2) 1) :offset 216}
+   :lfo-2/delay-trigger {:cc [0 122] :in [28 29] :enum ["Single" "Multi"] :decode #(bit-and (bit-shift-right % 3) 1) :offset 216}
+   :lfo-2/fade-mode {:cc [1 123] :in [4 7] :enum ["Fade In" "Fade Out" "Gate In" "Gate Out"] :decode #(bit-and (bit-shift-right % 4) 3) :offset 216}
 
    :lfo-3/waveform {:cc [0 88] :in [0 37] :enum lfo-waveform-enum :offset 217}
    :lfo-3/phase-offset {:cc [0 89] :in [0 119] :out [0 357] :offset 218}
@@ -316,12 +313,12 @@
    :lfo-3/delay-sync {:cc [0 93] :in [0 35] :enum sync-enum :offset 222}
    :lfo-3/rate {:cc [0 94] :in [0 127] :offset 223}
    :lfo-3/rate-sync {:cc [0 95] :in [0 35] :enum sync-enum :offset 224}
-   :lfo-3/one-shot {:cc [0 122] :in [32 33] :enum ["Normal" "OneShot"] :offset 225}
-   :lfo-3/key-sync {:cc [0 122] :in [34 35] :enum ["FreeRun" "KeySync"] :offset 225}
-   :lfo-3/common-sync {:cc [0 122] :in [36 37] :enum ["Normal" "Common"] :offset 225}
-   :lfo-3/delay-trigger {:cc [0 122] :in [38 39] :enum ["Single" "Multi"] :offset 225}
+   :lfo-3/one-shot {:cc [0 122] :in [32 33] :enum ["Normal" "OneShot"] :decode #(bit-and % 1) :offset 225}
+   :lfo-3/key-sync {:cc [0 122] :in [34 35] :enum ["FreeRun" "KeySync"] :decode #(bit-and (bit-shift-right % 1) 1) :offset 225}
+   :lfo-3/common-sync {:cc [0 122] :in [36 37] :enum ["Normal" "Common"] :decode #(bit-and (bit-shift-right % 2) 1) :offset 225}
+   :lfo-3/delay-trigger {:cc [0 122] :in [38 39] :enum ["Single" "Multi"] :decode #(bit-and (bit-shift-right % 3) 1) :offset 225}
    ;; NOTE: Docs say :in [4 7] but thats lfo-2/fade-mode
-   :lfo-3/fade-mode {:cc [1 123] :in [8 11] :enum ["Fade In" "Fade Out" "Gate In" "Gate Out"] :offset 379}
+   :lfo-3/fade-mode {:cc [1 123] :in [8 11] :enum ["Fade In" "Fade Out" "Gate In" "Gate Out"] :decode #(bit-and (bit-shift-right % 4) 3) :offset 225}
 
    :fx-pan/position {:cc 10 :in [0 127] :out [-64 63] :offset 105}
    :fx-pan/rate {:cc 88 :in [0 127] :offset 106}
@@ -466,12 +463,11 @@
    :gator/level-31 {:cc [5 30] :in [0 7] :offset 481}
    :gator/level-32 {:cc [5 31] :in [0 7] :offset 482}
 
-   ;; TODO: Encoding
-   :vocoder/on {:cc [0 122] :in [58 59] :enum ["Off" "On"] :offset 311}
-   :vocoder/sibilance-type {:cc [0 122] :in [60 61] :enum ["HiPass" "Noise"] :offset 311}
-   :vocoder/freeze {:cc [0 122] :in [62 63] :enum ["UnFreeze" "Freeze"]}
-   :vocoder/all-max {:cc [0 122] :in [64 65] :enum ["AllMax Off" "AllMax On"] :offset 311}
-   :vocoder/vocoder-input {:cc [0 122] :in [66 67] :enum ["Audio In" "VTOutput"] :offset 311}
+   :vocoder/on {:cc [0 122] :in [58 59] :enum ["Off" "On"] :decode #(bit-and % 1) :offset 311}
+   :vocoder/sibilance-type {:cc [0 122] :in [60 61] :enum ["HiPass" "Noise"] :decode #(bit-and (bit-shift-right % 1) 1) :offset 311}
+   :vocoder/freeze {:cc [0 122] :in [62 63] :enum ["UnFreeze" "Freeze"] :decode #(bit-and (bit-shift-right % 2) 1) :offset 311}
+   :vocoder/all-max {:cc [0 122] :in [64 65] :enum ["AllMax Off" "AllMax On"] :decode #(bit-and (bit-shift-right % 3) 1) :offset 311}
+   :vocoder/vocoder-input {:cc [0 122] :in [66 67] :enum ["Audio In" "VTOutput"] :decode #(bit-and (bit-shift-right % 4) 1) :offset 311}
    :vocoder/width {:cc [1 57] :in [0 127] :offset 313}
    :vocoder/sibilance {:cc [1 58] :in [0 127] :offset 314}
    :vocoder/spec-shift {:cc [1 59] :in [0 127] :out [-64 63] :offset 315}
@@ -534,9 +530,8 @@
 
    :vocal-tune/shift {:cc [1 80] :in [40 88] :out [-24 24] :offset 336}
    :vocal-tune/bend {:cc [1 81] :in [40 88] :out [-24 24] :offset 337}
-   ;; FIXME: Encoding
-   :vocal-tune/mode {:cc [0 123] :in [16 19] :enum ["Off" "Scale Correction" "KBCtrl" "Pitch"] :offset 439}
-   :vocal-tune/insert {:cc [0 123] :in [25 27] :enum ["PreFilter" "PostFilter" "PreFx"] :offset 439}
+   :vocal-tune/mode {:cc [0 123] :in [16 19] :enum ["Off" "Scale Correction" "KBCtrl" "Pitch"] :decode #(bit-and % 3) :offset 439}
+   :vocal-tune/insert {:cc [0 123] :in [25 27] :enum ["PreFilter" "PostFilter" "PreFx"] :decode #(bit-and (bit-shift-right % 5) 3) :offset 439}
    :vocal-tune/scale-type {:cc [2 56] :in [0 5] :enum ["Played" "Chromatic" "Major" "NatMinor" "HarMinor" "MelMinor"] :offset 440}
    :vocal-tune/scale-key {:cc [2 57] :in [0 11] :enum ["C" "C#" "D" "D#" "E" "F" "F#" "G" "G#" "A" "A#" "B"] :offset 441}
    :vocal-tune/correction-time {:cc [2 58] :in [0 127] :offset 442}
@@ -545,9 +540,8 @@
    :vocal-tune/vibrato-mod-wheel {:cc [2 61] :in [0 127] :offset 445}
    :vocal-tune/vibrato-rate {:cc [2 62] :in [0 127] :offset 446}
 
-   ;; FIXME: Encoding
-   :arp/on {:cc [0 122] :in [46 47] :enum ["Off" "On"] :offset 317}
-   :arp/key-latch {:cc [0 122] :in [50 51] :enum ["Latch Off" "Latch On"] :offset 317}
+   :arp/on {:cc [0 122] :in [46 47] :enum ["Off" "On"] :decode #(bit-and % 1) :offset 317}
+   :arp/key-latch {:cc [0 122] :in [50 51] :enum ["Latch Off" "Latch On"] :decode #(bit-and (bit-shift-right % 2) 1) :offset 317}
    :arp/octaves {:cc [1 62] :in [0 3] :out [1 4] :offset 318}
    :arp/rate-sync {:cc [1 63] :in [0 18] :enum arp-pattern-enum :offset 319}
    :arp/gate {:cc [1 64] :in [1 127] :offset 320}
@@ -556,17 +550,16 @@
    :arp/swing {:cc [1 68] :in [1 99] :offset 324}
    ;; Managed parameter for UltraNova compatibility_
    ;; :arp/mini-nova {:cc [127 127] :in [0 1] :offset 0}
-   :arp/length {:cc [60 40] :in [2 8] :offset 325}
+   :arp/length {:cc [60 40] :in [2 8] :decode #(dec (bit-and (bit-shift-right % 1) 7)) :offset 325}
 
-   ;; TODO: Figure out the encoding @ 326
-   :arp-1/step {:cc [60 32], :in [0 1], :offset 325},
-   :arp-2/step {:cc [60 33], :in [0 1], :offset 326},
-   :arp-3/step {:cc [60 34], :in [0 1], :offset 326},
-   :arp-4/step {:cc [60 35], :in [0 1], :offset 326},
-   :arp-5/step {:cc [60 36], :in [0 1], :offset 326},
-   :arp-6/step {:cc [60 37], :in [0 1], :offset 326},
-   :arp-7/step {:cc [60 38], :in [0 1], :offset 326},
-   :arp-8/step {:cc [60 39], :in [0 1], :offset 326},
+   :arp-1/step {:cc [60 32] :in [0 127] :decode #(* 127 (bit-and (bit-shift-right % 5) 1)) :offset 325}
+   :arp-2/step {:cc [60 33] :in [0 127] :decode #(* 127 (bit-and % 1)) :offset 326}
+   :arp-3/step {:cc [60 34] :in [0 127] :decode #(* 127 (bit-and (bit-shift-right % 1) 1)) :offset 326}
+   :arp-4/step {:cc [60 35] :in [0 127] :decode #(* 127 (bit-and (bit-shift-right % 2) 1)) :offset 326}
+   :arp-5/step {:cc [60 36] :in [0 127] :decode #(* 127 (bit-and (bit-shift-right % 3) 1)) :offset 326}
+   :arp-6/step {:cc [60 37] :in [0 127] :decode #(* 127 (bit-and (bit-shift-right % 4) 1)) :offset 326}
+   :arp-7/step {:cc [60 38] :in [0 127] :decode #(* 127 (bit-and (bit-shift-right % 5) 1)) :offset 326}
+   :arp-8/step {:cc [60 39] :in [0 127] :decode #(* 127 (bit-and (bit-shift-right % 6) 1)) :offset 326}
 
    :mod-matrix-1/source-1 {:cc [1 83] :in [0 18] :enum mod-matrix-source-enum :offset 339}
    :mod-matrix-1/source-2 {:cc [1 84] :in [0 18] :enum mod-matrix-source-enum :offset 340}
@@ -616,7 +609,6 @@
    :mod-matrix-8/depth {:cc [1 121] :in [0 127] :out [-64 63] :offset 377}
    :mod-matrix-8/destination {:cc [1 122] :in [0 69] :offset 378} ;; TODO: Enum
 
-   ;; FIXME: Does this really collide with lfo-n/fade-mode?!
    :mod-matrix-9/source-1 {:cc [1 123] :in [0 18] :enum mod-matrix-source-enum :offset 379}
    :mod-matrix-9/source-2 {:cc [1 124] :in [0 18] :enum mod-matrix-source-enum :offset 380}
    :mod-matrix-9/anim-trigger {:cc [1 125] :in [0 8] :enum anim-trigger-enum :offset 381}
